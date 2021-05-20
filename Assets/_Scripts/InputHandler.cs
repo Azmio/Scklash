@@ -5,7 +5,6 @@ using UnityEngine;
 [System.Serializable]
 public class InputHandler : MonoBehaviour
 {
-    //public static InputHandler inputHandle;
     //Accessable player input values
     public static Vector3 movementVector{get; private set;}//WSAD
 

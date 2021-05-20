@@ -4,16 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
-{
-    //private InputHandler input;
+{      
     public CharacterController pController;
+    private Camera mCamera;
 
+    public static Transform playerTransform;
+    
     public float rotationSpeed = 5f;
     public float moveSpeed = 5f;
+    public float cameraDistance = 15f;
 
     private void Awake()
     {
         pController = GetComponent<CharacterController>();//Find attached component
+        mCamera = Camera.main;
+        playerTransform = this.transform;
     }
 
     void Start()
@@ -22,38 +27,23 @@ public class PlayerMovement : MonoBehaviour
     }
         
     void Update()
-    {
-        Vector3 targetVector = new Vector3(InputHandler.movementVector.x, 0f, InputHandler.movementVector.z);
+    {     
+        Vector3 targetVector = new Vector3(InputHandler.movementVector.x, 0f, InputHandler.movementVector.z);//Input converted into Vector3
         MoveToTarget(targetVector);
-
-
-
-
-        /*
-        //Get player WASD input
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-
-        Vector3 direction = new Vector3(x, 0f, z);
-        Vector3 movement = transform.right//transform.right * x + transform.forward* z;
-
-        pController.Move(movement * moveSpeed * Time.deltaTime);*/
     }
 
-    private void MoveToTarget(Vector3 target)
+    private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
     {
         float speed = moveSpeed * Time.deltaTime;
-        target = Quaternion.Euler(0f, Camera.main.transform.eulerAngles.y, 0f) * target;
+        target = Quaternion.Euler(0f, mCamera.transform.eulerAngles.y, 0f) * target;
         pController.Move(target * speed);
 
         Quaternion lookDirection;
 
-        if (target != Vector3.zero)
+        if (target != Vector3.zero) //If input ongoing, update player rotation
         {
             lookDirection = Quaternion.LookRotation(target);
             pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed);
-        }
-        
-        
-    }
+        }        
+    }    
 }
