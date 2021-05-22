@@ -30,6 +30,14 @@ public class PlayerMovement : MonoBehaviour
     {     
         Vector3 targetVector = new Vector3(InputHandler.movementVector.x, 0f, InputHandler.movementVector.z);//Input converted into Vector3
         MoveToTarget(targetVector);
+
+        if (Input.GetKeyDown(KeyCode.Space)) // this is a test do refactor later if you want 
+        {
+            GameController.isPlayerDashing = true;
+            pController.Move(transform.forward * moveSpeed/2); //just to test because pressing space and seeing if the enemy followed the old position was lame
+            StartCoroutine(ResetDash());
+            
+        }
     }
 
     private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
@@ -46,4 +54,10 @@ public class PlayerMovement : MonoBehaviour
             pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed);
         }        
     }    
+    
+    IEnumerator ResetDash(float dashDelay = 1f)
+    {
+        yield return new WaitForSeconds(dashDelay);
+        GameController.isPlayerDashing = false;
+    }
 }
