@@ -10,7 +10,8 @@ public class CameraScript : MonoBehaviour
 
     void Update()
     {
-        placeHolder.transform.position = PlayerMovement.playerTransform.position;//Follow player without being attached as child
+        if(PlayerMovement.playerTransform != null)
+            placeHolder.transform.position = PlayerMovement.playerTransform.position;//Follow player without being attached as child
 
         //transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
     }

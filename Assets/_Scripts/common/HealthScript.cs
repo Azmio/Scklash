@@ -4,15 +4,46 @@ using UnityEngine;
 
 public class HealthScript : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public int maxHealth = 100;
+    public int currentHealth;
+
+    void Awake()    
     {
-        
+        currentHealth = maxHealth; //Ensure on spawn health is at max
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        //Damage(0); //Test destroy to avoid update check
     }
+
+    private void OnDestroy()
+    {
+        //do something fancy
+        Debug.Log(gameObject.name + " DED");
+    }
+
+    public void Damage(int amount)
+    {
+        currentHealth -= amount;
+
+        if (currentHealth <= 0) //If health depleted, destroy this object
+            Destroy(gameObject);
+    }
+
+    public void Heal(int amount)
+    {
+        if (amount <= 0)//Full heal
+            currentHealth = maxHealth;
+        else
+        {
+            int newHealth = currentHealth + amount; //Calculate potential health
+
+            if(newHealth > maxHealth)
+                currentHealth = maxHealth; //Health will exceed maximum - set to maximum
+            else            
+                currentHealth = newHealth; //Health below maximum - set to new health           
+        }
+    }
+
 }
