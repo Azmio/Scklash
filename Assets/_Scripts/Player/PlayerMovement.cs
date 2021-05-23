@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     public float rotationSpeed = 5f;
     public float moveSpeed = 5f;
     public float cameraDistance = 15f;
+    //Add in a dash timeout so that player won't be able to spam dash
 
     private void Awake()
     {
@@ -35,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
         {
             GameController.isPlayerDashing = true;
             pController.Move(transform.forward * moveSpeed/2); //just to test because pressing space and seeing if the enemy followed the old position was lame
-            StartCoroutine(ResetDash());
+            StartCoroutine(ResetDash(1f));
             
         }
     }
