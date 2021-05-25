@@ -16,7 +16,7 @@ public class EnemyMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        MoveToPlayer(GameController.gameController.toFollow);
+        MoveToPlayer(GameController.instance.toFollow);
     }
     private void MoveToPlayer(Vector3 target) //Move and rotate enemy to player's direction
     {

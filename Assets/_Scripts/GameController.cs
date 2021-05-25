@@ -4,16 +4,27 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    static public GameController gameController;
+    static public GameController instance;
+
+    public InputHandler inputHandler;
 
     static public bool isPlayerDashing;
 
     public Vector3 toFollow;
     public GameObject Player;
+
+
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        gameController = this;
+        if (instance == null)
+        {
+            instance = this;
+            inputHandler = InputHandler.instance;
+            DontDestroyOnLoad(this);
+        }
+        else
+            Destroy(this);
     }
 
     // Update is called once per frame
