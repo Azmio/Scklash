@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController pController;
     private Camera mCamera;
 
+    //Local Variables
     public static Transform playerTransform;
     private Quaternion lookDirection;
     private PlayerActions action;
