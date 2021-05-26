@@ -803,7 +803,7 @@ MonoBehaviour:
   dashSpeed: 20
   dashResetTime: 1
   attackRange: 2
-  attackArc: 180
+  attackArc: 150
   attackResetTime: 1
   colliders: []
   attackDamage: 10
