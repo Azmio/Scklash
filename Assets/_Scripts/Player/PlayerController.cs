@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     public float dashResetTime = 0f;
     //Basic Attack
     public float attackRange = 3f;
-    [Range(0, 360)] public float attackArc = 180f;
+    [Range(0, 360)] public float attackArc = 150f;
     public float attackResetTime = 1f;
     public Collider[] colliders;
     public int attackDamage = 10;
