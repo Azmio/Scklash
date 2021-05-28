@@ -30,6 +30,14 @@ public class HealthScript : MonoBehaviour
         healthSlider.value = currentHealth;
     }
 
+    void InitializeIfEnemy()
+    {
+        if (this.tag == "Enemy")
+        {
+            EnemySpawner.enemySpawner.enemiesInTheScene.Add(this.gameObject);
+        }
+    }
+
     private void OnDestroy()
     {
         //do something fancy
