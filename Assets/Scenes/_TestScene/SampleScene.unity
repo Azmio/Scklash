@@ -407,7 +407,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 226556419}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.917628, y: 2.2790093, z: 7.554823}
+  m_LocalPosition: {x: 2.45, y: 2.2790093, z: 7.554823}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -804,10 +804,14 @@ MonoBehaviour:
   dashResetTime: 1
   attackRange: 2
   attackArc: 150
-  attackResetTime: 1
-  colliders: []
+  attackResetTime: 0.3
+  targetList: []
   attackDamage: 10
-  attackDamageMultiplier: 3
+  attackDamageMultiplier: 0
+  maxComboDelay: 0.5
+  isHolding: 0
+  isSpamming: 0
+  holdDetect: 0.8
 --- !u!82 &1702546732
 AudioSource:
   m_ObjectHideFlags: 0

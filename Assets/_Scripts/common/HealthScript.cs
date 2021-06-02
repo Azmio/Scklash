@@ -20,7 +20,12 @@ public class HealthScript : MonoBehaviour
     private void OnDestroy()
     {
         //do something fancy
-        Debug.Log(gameObject.name + " DED");
+        //Debug.Log(gameObject.name + " DED");
+    }
+
+    public int GetHealth()
+    {
+        return currentHealth;
     }
 
     public void Damage(int amount)

@@ -11,7 +11,6 @@ public class InputHandler : MonoBehaviour
 
     //Accessable player input values
     public Vector3 movementVector {get; private set;}
-    public Vector3 rotationVector { get; private set;}
 
     private void Awake()
     {
@@ -31,9 +30,8 @@ public class InputHandler : MonoBehaviour
         float z = Input.GetAxis("Vertical");
         movementVector = new Vector3(x, 0f, z);
 
-        //Player mouse direction input
-        //float 
-        //rotationVector = new Vector3(0, 0, 0);
+        //Player mouse input
+
     }
 
     public KeyCode GetKeyCode(PlayerActions currentAction) //Check key Code
@@ -68,7 +66,7 @@ public class InputHandler : MonoBehaviour
         {
             if (key.action == currentAction)
             {
-                return Input.GetKeyDown(key.keyCode); //If key exists, log key event
+                return Input.GetKey(key.keyCode); //If key exists, log key event
             }
         }
 
@@ -81,7 +79,7 @@ public class InputHandler : MonoBehaviour
         {
             if (key.action == currentAction)
             {
-                return Input.GetKeyDown(key.keyCode); //If key exists, log key event
+                return Input.GetKeyUp(key.keyCode); //If key exists, log key event
             }
         }
 
@@ -93,5 +91,5 @@ public enum PlayerActions
 {
     Dash,
     Attack,
-    HunterMark
+    Thrust
 }
