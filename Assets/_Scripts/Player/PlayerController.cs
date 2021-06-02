@@ -26,14 +26,25 @@ public class PlayerController : MonoBehaviour
     //Dash
     public float dashTime = 0.3f;
     public float dashSpeed = 20f;
-    public float dashResetTime = 0f;
+    public float dashResetTime = 0.3f;
     //Basic Attack
     public float attackRange = 3f;
     [Range(0, 360)] public float attackArc = 150f;
     public float attackResetTime = 1f;
-    public Collider[] colliders;
+    public List<GameObject> targetList;
     public int attackDamage = 10;
-    public int attackDamageMultiplier = 3;
+    public int attackDamageMultiplier = 1;
+    //Attack Combo
+    private float lastAttackTime, lastHoldTime;
+    private int comboCounter;
+    public float maxComboDelay = 0.9f;
+    //Hold Attack
+    [SerializeField] private bool isHolding;
+    [SerializeField] private bool isSpamming;
+    public float holdDetect = 0.1f;
+
+    //private float[] attackTimes;
+
 
     private void Awake()
     {
@@ -45,7 +56,8 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        
+        isHolding = false;
+        isSpamming = false;
     }
         
     void Update()
@@ -54,19 +66,64 @@ public class PlayerController : MonoBehaviour
         MoveToTarget(targetVector);
         //RotateToTarget(targetVector);
 
-        if(inputHandler.GetKeyDown(PlayerActions.Dash) && !isBusy)
+        float timeHeld = Time.time - lastHoldTime;
+        Debug.Log(timeHeld);
+        if (inputHandler.GetKeyDown(PlayerActions.Dash) && !isBusy)
         {
             StartCoroutine(Dash(dashResetTime));
             //Debug.Log("DAAAAAAAASSSSHHHHH");
         }
+
         if(inputHandler.GetKeyDown(PlayerActions.Attack) && !isBusy)
         {
+            lastHoldTime = Time.time;
+            RotateToTarget();
+            isHolding = false;
+        }
+
+        if (inputHandler.GetKeyUp(PlayerActions.Attack) && isHolding)
+        {
+            isHolding = false;
+        }
+        else if (inputHandler.GetKeyUp(PlayerActions.Attack) && !isBusy && !isHolding)
+        {
             //Face Click Location
+            isHolding = false;
+            StartCoroutine(Attack(attackResetTime));
+        }
+        else if (inputHandler.GetKey(PlayerActions.Attack) && !isBusy)
+        {
+            if (Time.time - lastHoldTime > holdDetect && !isHolding)
+            {
+                isHolding = true;
+                Debug.Log("Held: " + Time.time + " :: " + lastHoldTime + " :: " + (Time.time - lastHoldTime));
+            }
+
+            if(isHolding)
+            {
+                Debug.Log("HUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUH");
+            }
+        }
+        
+        
+
+        
+
+
+       
+
+
+
+        if (inputHandler.GetKeyDown(PlayerActions.Thrust) && !isBusy)
+        {
             RotateToTarget();
 
-            StartCoroutine(Attack(attackResetTime));
-            //Debug.Log("CHAAAAAAAAAAA");
         }
+
+
+        
+        if (comboCounter >= 1 && (Time.time - lastAttackTime) > maxComboDelay)        
+            comboCounter = 0;   
     }
 
     private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
@@ -118,25 +175,49 @@ public class PlayerController : MonoBehaviour
         GameController.isPlayerDashing = false;
     }
 
+    private bool detectAttackable(float range, float Arc)
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, range, 1 << 8); //create sphere around player with radius of 3
+        targetList = new List<GameObject>();
+
+        if (colliders.Length > 0)
+        {
+            foreach (Collider target in colliders)
+            {
+                Vector3 targetDirection = (target.transform.position - transform.position).normalized;
+                float angle = Vector3.Angle(targetDirection, transform.forward);
+
+                if (angle <= Arc / 2)
+                {
+                    targetList.Add(target.gameObject);
+                }
+            }
+
+            return true;
+        }
+        else
+            return false;
+    }
+
+
     IEnumerator Attack(float resetTime)
     {
         isBusy = true;
         //Animate
+        attackDamageMultiplier = 1;
 
-       
-        //yield return new WaitForSeconds(0.5f);
-
-        colliders = Physics.OverlapSphere(transform.position, attackRange, 1<<8); //create sphere around player with radius of 3
-        
-        if (colliders.Length > 0)
+        /**if (colliders.Length > 0)
         {
-            //Debug.Log("ENEMY Located");
+            //float currentTime = Time.time;        
+            comboCounter++;
+            lastAttackTime = Time.time;
+            Debug.Log("Combo: " + comboCounter);
+
             foreach (Collider target in colliders)
             {
-                Vector3 targetDirection = (target.transform.position - transform.position);
+                Vector3 targetDirection = (target.transform.position - transform.position).normalized;
 
                 float angle = Vector3.Angle(targetDirection, transform.forward);
-
                 //Debug.Log(target.name + ": " + targetDirection + "   Angle:" + angle);
 
                 if (angle <= attackArc/2)
@@ -145,33 +226,99 @@ public class PlayerController : MonoBehaviour
 
                     Vector3 targetFacing = (enemyHealth.transform.forward - transform.position).normalized;
 
+                    if (enemyHealth.GetHealth() > 0 && comboCounter == 4)
+                    {
+                        attackDamageMultiplier += 2;
+                        Debug.Log("Combo Attack Complete");
+                        yield return KnockbackTarget(enemyHealth.gameObject);
+                        resetTime = 0.5f;
+                        comboCounter = 0;
+                    }
+
                     if(Vector3.Dot(targetFacing, transform.forward) < 0.05f)
                     {
-                        enemyHealth.Damage(attackDamage*attackDamageMultiplier);
-                        Debug.Log("Target Facing Away From Player");
+                        attackDamageMultiplier += 2;
+                        Debug.Log("Sneak Attack Multiplier Added");
                     }
-                    else
-                    {
-                        enemyHealth.Damage(attackDamage);
-                        Debug.Log("Target Facing Towards Player");
-                    }
-                    
-                    Debug.Log("Target facing: " + Vector3.Dot(targetFacing, transform.forward));
-                    
+
+                    enemyHealth.Damage(attackDamage * attackDamageMultiplier);
+                    //Debug.Log("Target facing: " + Vector3.Dot(targetFacing, transform.forward));                    
                     yield return null;
                 }
                 else
                 {
-                    Debug.Log("Enemy Not within attack angle");
+                    //Debug.Log("Enemy Not within attack angle");
                     yield return null;
                 }
             }
         }
         else
-            Debug.Log("No Enemy Near");
+        {
+            //Debug.Log("No Target In Range");
+            comboCounter = 0;
+        }*/
+
+        if (detectAttackable(attackRange, attackArc))
+        {
+            comboCounter++;
+            lastAttackTime = Time.time;
+
+            foreach (GameObject target in targetList)
+            {
+                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
+                Vector3 targetFacing = (enemyHealth.transform.forward - transform.position).normalized;
+
+                if (enemyHealth.GetHealth() > 0 && comboCounter == 4)
+                {
+                    attackDamageMultiplier *= 2;
+                    Debug.Log("Combo Attack Complete");
+                    yield return KnockbackTarget(enemyHealth.gameObject);
+                    resetTime = 0.5f;
+                    comboCounter = 0;
+                }
+
+                if (Vector3.Dot(targetFacing, transform.forward) < 0.05f)
+                {
+                    attackDamageMultiplier *= 2;
+                    Debug.Log("Sneak Attack Multiplier Added");
+                }
+
+                enemyHealth.Damage(attackDamage * attackDamageMultiplier);
+                Debug.Log("Attacked: " + target.name + " / Current Health: " + enemyHealth.GetHealth() + " / Target facing: " + targetFacing + " / Damage Done: " + attackDamage * attackDamageMultiplier);
+            }
+        }
+        else
+            comboCounter = 0;
 
 
-        isBusy = false;
+
+        attackDamageMultiplier = 1;  
+        //Debug.Log("Attack Reset Time: " + resetTime);
         yield return new WaitForSeconds(resetTime);
+        resetTime = 0.3f;
+        isBusy = false;
+    }
+
+    IEnumerator Thrust(float resetTime)
+    {
+
+
+        yield return null;
+    }
+
+    IEnumerator KnockbackTarget(GameObject target)
+    {
+        float startTime = Time.time;
+
+        Vector3 knockbackDirection = (target.transform.position - transform.position).normalized;
+
+        while (Time.time < startTime + dashTime)
+        {
+            target.GetComponent<CharacterController>().Move(knockbackDirection * dashSpeed * Time.deltaTime);
+
+            yield return null;
+        }
+        //Debug.Log("Get Knocked");
+        yield return null;
     }
 }
