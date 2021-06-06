@@ -7,20 +7,38 @@ public class HealthScript : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
-    void Awake()    
+    void Start()    
     {
         currentHealth = maxHealth; //Ensure on spawn health is at max
+        InitializeIfEnemy();
     }
 
     private void Update()
     {
-        //Damage(0); //Test destroy to avoid update check
+        if (currentHealth <=0) // minor test
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
+    void InitializeIfEnemy()
+    {
+        if (this.tag == "Enemy")
+        {
+            EnemySpawner.enemySpawner.enemiesInTheScene.Add(this.gameObject);
+        }
     }
 
     private void OnDestroy()
     {
         //do something fancy
-        //Debug.Log(gameObject.name + " DED");
+
+        if (this.tag == "Enemy")
+        {
+            EnemySpawner.enemySpawner.enemiesInTheScene.Remove(this.gameObject);
+        }
+
+        Debug.Log(gameObject.name + " DED");
     }
 
     public int GetHealth()
