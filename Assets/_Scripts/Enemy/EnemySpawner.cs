@@ -22,6 +22,7 @@ public class EnemySpawner : MonoBehaviour
     public float waveDelay = 3f;
     public int waveNumber = 0;
     public float nextWaveCountdown;
+    public bool toLoop = false;
 
     public List<GameObject> enemiesInTheScene; // push in the spawned enemies in here
 
@@ -30,11 +31,12 @@ public class EnemySpawner : MonoBehaviour
     public SpawnerState state = SpawnerState.COUNTING;
     private void Start()
     {
+        
         //check if we have at least one wave and one spawn point
-        CheckParameters();
         enemySpawner = this;
+        spawnPoints = gameObject.GetComponentsInChildren<Transform>();
         nextWaveCountdown = waveDelay;
-        spawnPoints= gameObject.GetComponentsInChildren<Transform>();
+        CheckParameters();
     }
     
     void CheckParameters()
@@ -53,7 +55,7 @@ public class EnemySpawner : MonoBehaviour
     {
         if (state == SpawnerState.WAITING)
         {
-            if (!EnemyIsAlive())
+            if (EnemyIsDead())
             {
                 //begin new wave
                 BegingNextWave();
@@ -82,8 +84,16 @@ public class EnemySpawner : MonoBehaviour
         nextWaveCountdown = waveDelay;
         if (waveNumber + 1 >= waves.Length )
         {
-            waveNumber = 0;
-            Debug.Log("Looping through the waves again");
+            if (toLoop)
+            {
+                waveNumber = 0;
+                Debug.Log("Looping through the waves again");
+            }
+            else
+            {
+                return;
+            }
+
             // check if all the waves are done for and add code to loop the waves
         }
         else
@@ -115,13 +125,14 @@ public class EnemySpawner : MonoBehaviour
 
 
 
-    bool EnemyIsAlive()
+    bool EnemyIsDead()
     {
         if (enemiesInTheScene.Count == 0)
         {
-            return false;
+            Debug.Log("Enemy died");
+            return true;
         }
-        return true;
+        return false;
     }
 
 

@@ -122,7 +122,7 @@ NavMeshSettings:
     preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: b7ceba8e65037004bab2645b7bb0de5b, type: 2}
 --- !u!1 &5186437
 GameObject:
   m_ObjectHideFlags: 0
@@ -408,7 +408,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waves:
   - name: First Wave
-    count: 5
+    count: 1
     enemyPrefab: {fileID: 5325715122698222648, guid: 7589f2c03c7b0254eb326b2bab5f0edc, type: 3}
     spawnDelay: 1
   - name: Second Wave
@@ -416,9 +416,10 @@ MonoBehaviour:
     enemyPrefab: {fileID: 5325715122698222648, guid: 7589f2c03c7b0254eb326b2bab5f0edc, type: 3}
     spawnDelay: 1
   spawnPoints: []
-  waveDelay: 3
+  waveDelay: 1
   waveNumber: 0
   nextWaveCountdown: 0
+  toLoop: 0
   enemiesInTheScene: []
   state: 2
 --- !u!4 &173839497
@@ -442,7 +443,7 @@ Transform:
   - {fileID: 1362762615}
   - {fileID: 1197314494}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &192937874
 GameObject:
@@ -721,7 +722,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:
@@ -1014,12 +1015,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1702546727}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.86624, y: 1, z: 6.4630795}
+  m_LocalPosition: {x: 2.5, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 73707886}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1702546730
 MonoBehaviour:
@@ -1157,5 +1158,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
