@@ -41,7 +41,13 @@ public class HealthScript : MonoBehaviour
     private void OnDestroy()
     {
         //do something fancy
-        //Debug.Log(gameObject.name + " DED");
+
+        if (this.tag == "Enemy")
+        {
+            EnemySpawner.enemySpawner.enemiesInTheScene.Remove(this.gameObject);
+        }
+
+        Debug.Log(gameObject.name + " DED");
     }
 
     public int GetHealth()
