@@ -23,7 +23,7 @@ public class HealthScript : MonoBehaviour
 
     void InitializeIfEnemy()
     {
-        if (this.tag == "Enemy")
+        if (gameObject.tag == "Enemy")
         {
             EnemySpawner.enemySpawner.enemiesInTheScene.Add(this.gameObject);
         }

@@ -462,7 +462,7 @@ GameObject:
   - component: {fileID: 248983716}
   - component: {fileID: 248983722}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Ranged Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -536,15 +536,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3705899588ae1ce4e93a331b859abba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRanged: 0
+  isRanged: 1
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
   rangedAttack: {fileID: 0}
   meleeAttack: {fileID: 0}
-  attackRange: 2
-  currentAction: 0
-  changePosition: 1.5
-  timeUntilRanged: 0
+  attackRange: 10
+  currentAction: 2
+  timeUntilPositionChange: 2
+  timeUntilRangedAttack: 0
+  isChangingPosition: 0
 --- !u!114 &248983715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -578,12 +579,11 @@ MonoBehaviour:
   damage: 3
   hitDelay: 1
   timeUntilHit: 0.5
-  isAttacking: 0
   explosionCount: 3
   explosionDelay: 0.5
   currentCount: 0
   explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
-  doneAttacking: 0
+  doneAttacking: 1
 --- !u!114 &248983716
 MonoBehaviour:
   m_ObjectHideFlags: 0

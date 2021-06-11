@@ -14,19 +14,13 @@ public class EnemyMovement : MonoBehaviour
     //testing NavMesh to make the Enemies "smarter"
     public NavMeshAgent agent;
 
-    public EnemyCombat enemyCombat;
-
-    // a basic finite state machine to make the AI more manageable
-    public AIState currentState;
-
-    public float attackRange = 2f;
-
-    public bool isRanged = false;
-
+    //an offset which is nothing but a random angle that will be used to position the enemy on a random point which will be in the attack radius
     public float targetOffset;
+
+    public bool changePosition = false;
+
     void Start()
     {
-        //script still messy try fixing local avoidance, check the video from weird dude's rpg series
         InitialiseEnemy();
     }
 
@@ -34,30 +28,21 @@ public class EnemyMovement : MonoBehaviour
     {
         //Not sure if we need the character controller anymore but ill let it be
         eController = GetComponent<CharacterController>();
-
         agent = GetComponent<NavMeshAgent>();
-
-        enemyCombat = GetComponent<EnemyCombat>();
 
         //So that the agent won't rotate on it's own and that we could do it via our move to player function
         agent.updateRotation = false;
+        //Getting a random angle between 0 and 360 and converting it into radian which will be the enemy offset
+        GetRandomAngle();
 
-        //Getting a random angle between 0 and 360 and converting it into radian
-        targetOffset= Random.Range(0, 360) * 0.0174533f;
-
+        //Setting the nav mesh agent's speed as the move speed
         agent.speed = moveSpeed;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void MoveToPlayer(Vector3 target,float _attackRange) //Give the navmesh agent a target point
     {
-        currentState.Movement(this);
-    }
-    public void MoveToPlayer(Vector3 target) //Move and rotate enemy to player's direction
-    {
-        agent.destination = GetTarget(target);
+        agent.destination = GetTarget(target, _attackRange);
         return;
-
     }
 
     public void UpdateDirection(Vector3 target)
@@ -73,17 +58,30 @@ public class EnemyMovement : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookDirection, Time.deltaTime * turnSpeed);
 
     }
+
+
+
     // A function that would assign the player's target as a point that is around the player within the attack range instead of the player itself
     // thus making the enemies seem like they surround the player and also decrease the clutter where the enemies try and push each other when in large groups
-    Vector3 GetTarget(Vector3 _target)
+    Vector3 GetTarget(Vector3 _target, float _attackRange)
     {
         Vector3 temp = Vector3.zero;
 
         // using the equation of circle, getting a point on the circumference of the circle based on an offset that is a randomised value for each enemy
-        temp.x = _target.x + (attackRange * Mathf.Cos(targetOffset));
+        temp.x = _target.x + (_attackRange * Mathf.Cos(targetOffset));
 
-        temp.z = _target.z + (attackRange * Mathf.Sin(targetOffset));
+        temp.z = _target.z + (_attackRange * Mathf.Sin(targetOffset));
         return temp;
+    }
+
+
+    //Give a Random offset angle in radian if previous value was nil otherwise give an angle that is 5-30 degrees greater or lesser
+    public void GetRandomAngle(float _previous=0)
+    {
+        if (_previous == 0)
+            targetOffset = Random.Range(0, 360) * 0.0174533f;
+        else
+            targetOffset = _previous + (Random.Range(10, 30) * 0.0174533f * (Random.Range(0, 2) * 2 - 1));
     }
 
 }

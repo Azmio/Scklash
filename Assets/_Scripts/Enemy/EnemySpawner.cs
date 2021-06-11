@@ -12,10 +12,19 @@ public class EnemySpawner : MonoBehaviour
     {
         public string name; // name because why not
         public int count; // number of enemies that we want in each wave
-        public GameObject enemyPrefab; //useful if we want to add different type of enemies
+       // public GameObject enemyPrefab; //useful if we want to add different type of enemies
         public float spawnDelay; // delay between each consecutive enemy spawn
+        public GameObject rangedEnemy;
+        public GameObject meleeEnemy;
     }
 
+    //discarded enemy type class which was used by the spawnrate based spawner
+    [System.Serializable]
+    public class EnemyType
+    {
+        public GameObject enemyPrefab;
+        public float SpawnRate;
+    }
 
     public EnemyWave[] waves;
     public Transform[] spawnPoints;
@@ -109,9 +118,17 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log("Spawning Wave" + wave.name);
         state = SpawnerState.SPAWNING;
 
-        for(int i = 0; i < wave.count; i++)
+        for(int i = 1; i <= wave.count; i++)
         {
-            SpawnEnemy(wave.enemyPrefab);
+            if (i % 5 == 0)
+            {
+                SpawnEnemy(wave.rangedEnemy);
+            }
+            else
+            {
+                SpawnEnemy(wave.meleeEnemy);
+            }
+            
             yield return new WaitForSeconds(wave.spawnDelay);
         }
 
@@ -122,9 +139,21 @@ public class EnemySpawner : MonoBehaviour
     }
 
 
-
-
-
+    //discarded enemy selector that's based on spawn rate
+    /*
+    public GameObject GetEnemyToSpawn(EnemyWave wave)
+    {
+        float chance = Random.value;
+        foreach (EnemyType enemy in wave.enemyTypes)
+        {
+            if (chance> enemy.SpawnRate)
+            {
+                return enemy.enemyPrefab;
+            }
+        }
+        return null;
+    }
+    */
     bool EnemyIsDead()
     {
         if (enemiesInTheScene.Count == 0)

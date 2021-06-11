@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
-    // Start is called before the first frame update
+    //Time until the explosion
     public float timeDuration = 2.5f;
-    public Vector3 target;
+
+    //Indicator color at the start
     public Color startColor=Color.white;
+
+
+    //Indicator color at the time of explosion
     public Color stopColor=Color.red;
+
+    //Collider that will be used to check whether player is in the zone or not
+
     public CapsuleCollider capsuleCollider;
     void Start()
     {
@@ -18,6 +25,8 @@ public class Explosion : MonoBehaviour
     IEnumerator InitiateExplosion(float _time,float _destroy)
     {
         float currentTime = 0;
+
+        //Lerps the color of indicator over the given time duration
         while (currentTime < _time)
         {
             float t = currentTime / _time;
@@ -25,9 +34,10 @@ public class Explosion : MonoBehaviour
             currentTime += Time.deltaTime;
             yield return null;
         }
-
+        //Once the color changes the collider is enabled
         capsuleCollider.enabled = true;
 
+        //The object is destroyed after a specific time period which marks the end of the explosion
         yield return new WaitForSeconds(_destroy);
 
         Destroy(this.gameObject);
@@ -36,8 +46,10 @@ public class Explosion : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+
         if (other.tag == "Player")
         {
+            //Damage the player
             Debug.Log("Player Caught In Explosion");
         }
     }
