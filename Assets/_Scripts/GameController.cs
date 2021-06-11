@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class GameController : MonoBehaviour
 
     public Vector3 toFollow;
     public GameObject Player;
+
+    //GUI
+    public Slider focusSlider;
 
 
     // Start is called before the first frame update
@@ -27,10 +31,16 @@ public class GameController : MonoBehaviour
             Destroy(this);
     }
 
+    private void Start()
+    {
+        
+    }
+
     // Update is called once per frame
     void Update()
     {
         UpdateToFollow(isPlayerDashing);
+        focusSlider.value = Player.GetComponent<PlayerController>().focus;
     }
 
     void UpdateToFollow(bool dashCheck)
