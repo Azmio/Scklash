@@ -12,16 +12,26 @@ public class EnemySpawner : MonoBehaviour
     {
         public string name; // name because why not
         public int count; // number of enemies that we want in each wave
-        public GameObject enemyPrefab; //useful if we want to add different type of enemies
+       // public GameObject enemyPrefab; //useful if we want to add different type of enemies
         public float spawnDelay; // delay between each consecutive enemy spawn
+        public GameObject rangedEnemy;
+        public GameObject meleeEnemy;
     }
 
+    //discarded enemy type class which was used by the spawnrate based spawner
+    [System.Serializable]
+    public class EnemyType
+    {
+        public GameObject enemyPrefab;
+        public float SpawnRate;
+    }
 
     public EnemyWave[] waves;
     public Transform[] spawnPoints;
     public float waveDelay = 3f;
     public int waveNumber = 0;
     public float nextWaveCountdown;
+    public bool toLoop = false;
 
     public List<GameObject> enemiesInTheScene; // push in the spawned enemies in here
 
@@ -30,11 +40,12 @@ public class EnemySpawner : MonoBehaviour
     public SpawnerState state = SpawnerState.COUNTING;
     private void Start()
     {
+        
         //check if we have at least one wave and one spawn point
-        CheckParameters();
         enemySpawner = this;
+        spawnPoints = gameObject.GetComponentsInChildren<Transform>();
         nextWaveCountdown = waveDelay;
-        spawnPoints= gameObject.GetComponentsInChildren<Transform>();
+        CheckParameters();
     }
     
     void CheckParameters()
@@ -53,7 +64,7 @@ public class EnemySpawner : MonoBehaviour
     {
         if (state == SpawnerState.WAITING)
         {
-            if (!EnemyIsAlive())
+            if (EnemyIsDead())
             {
                 //begin new wave
                 BegingNextWave();
@@ -82,8 +93,16 @@ public class EnemySpawner : MonoBehaviour
         nextWaveCountdown = waveDelay;
         if (waveNumber + 1 >= waves.Length )
         {
-            waveNumber = 0;
-            Debug.Log("Looping through the waves again");
+            if (toLoop)
+            {
+                waveNumber = 0;
+                Debug.Log("Looping through the waves again");
+            }
+            else
+            {
+                return;
+            }
+
             // check if all the waves are done for and add code to loop the waves
         }
         else
@@ -99,9 +118,17 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log("Spawning Wave" + wave.name);
         state = SpawnerState.SPAWNING;
 
-        for(int i = 0; i < wave.count; i++)
+        for(int i = 1; i <= wave.count; i++)
         {
-            SpawnEnemy(wave.enemyPrefab);
+            if (i % 5 == 0)
+            {
+                SpawnEnemy(wave.rangedEnemy);
+            }
+            else
+            {
+                SpawnEnemy(wave.meleeEnemy);
+            }
+            
             yield return new WaitForSeconds(wave.spawnDelay);
         }
 
@@ -112,16 +139,29 @@ public class EnemySpawner : MonoBehaviour
     }
 
 
-
-
-
-    bool EnemyIsAlive()
+    //discarded enemy selector that's based on spawn rate
+    /*
+    public GameObject GetEnemyToSpawn(EnemyWave wave)
+    {
+        float chance = Random.value;
+        foreach (EnemyType enemy in wave.enemyTypes)
+        {
+            if (chance> enemy.SpawnRate)
+            {
+                return enemy.enemyPrefab;
+            }
+        }
+        return null;
+    }
+    */
+    bool EnemyIsDead()
     {
         if (enemiesInTheScene.Count == 0)
         {
-            return false;
+            Debug.Log("Enemy died");
+            return true;
         }
-        return true;
+        return false;
     }
 
 
