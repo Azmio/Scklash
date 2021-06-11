@@ -23,6 +23,8 @@ public class PlayerController : MonoBehaviour
 
     //Player Abilities
     public bool isBusy; //Currently preforming an action
+    //Focus bar
+    public int focus;
     //Dash
     public float dashTime = 0.3f;
     public float dashSpeed = 20f;
@@ -67,7 +69,7 @@ public class PlayerController : MonoBehaviour
         //RotateToTarget(targetVector);
 
         float timeHeld = Time.time - lastHoldTime;
-        Debug.Log(timeHeld);
+        //Debug.Log(timeHeld);
         if (inputHandler.GetKeyDown(PlayerActions.Dash) && !isBusy)
         {
             StartCoroutine(Dash(dashResetTime));
@@ -77,7 +79,7 @@ public class PlayerController : MonoBehaviour
         if(inputHandler.GetKeyDown(PlayerActions.Attack) && !isBusy)
         {
             lastHoldTime = Time.time;
-            RotateToTarget();
+            RotateToClickLocation();
             isHolding = false;
         }
 
@@ -101,23 +103,21 @@ public class PlayerController : MonoBehaviour
 
             if(isHolding)
             {
-                Debug.Log("HUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUH");
+                if(detectAttackable(attackRange, attackArc))
+                {
+                    foreach(GameObject enemy in targetList)
+                    {
+                        StartCoroutine(KnockbackTarget(enemy));
+                        Debug.Log("Boop");
+                    }
+                }
             }
-        }
-        
-        
-
-        
-
-
-       
-
-
+        }     
 
         if (inputHandler.GetKeyDown(PlayerActions.Thrust) && !isBusy)
         {
-            RotateToTarget();
-
+            RotateToClickLocation();
+            StartCoroutine(Thrust(attackResetTime));
         }
 
 
@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
         }
     }    
 
-    private void RotateToTarget()
+    private void RotateToClickLocation()
     {   
         //Character rotate to mouse on screen position
         Plane plane = new Plane(Vector3.up, transform.position);
@@ -154,10 +154,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void RotateToTarget(Transform target)
+    {
+        lookDirection = Quaternion.LookRotation(target.position);
+        pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed*100f);
+    }
+
     IEnumerator Dash(float resetTime)
     {
         float startTime = Time.time;
-
+        
         isBusy = true;
         GameController.isPlayerDashing = true;
 
@@ -173,6 +179,7 @@ public class PlayerController : MonoBehaviour
         isBusy = false;
         yield return new WaitForSeconds(resetTime);
         GameController.isPlayerDashing = false;
+        
     }
 
     private bool detectAttackable(float range, float Arc)
@@ -284,6 +291,8 @@ public class PlayerController : MonoBehaviour
                 }
 
                 enemyHealth.Damage(attackDamage * attackDamageMultiplier);
+
+                focus += 10 * attackDamageMultiplier;
                 Debug.Log("Attacked: " + target.name + " / Current Health: " + enemyHealth.GetHealth() + " / Target facing: " + targetFacing + " / Damage Done: " + attackDamage * attackDamageMultiplier);
             }
         }
@@ -301,13 +310,86 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator Thrust(float resetTime)
     {
+        isBusy = true;
+        
+        bool slicable = false;
 
+        if (detectAttackable(attackRange, 50))
+        {
+            List<GameObject> targetEnemyList = new List<GameObject>();
 
-        yield return null;
+            foreach (GameObject target in targetList)
+            {
+                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
+
+                if(enemyHealth.currentHealth/enemyHealth.maxHealth <= 0.35f)
+                {
+                    slicable = true;
+                    Physics.IgnoreLayerCollision(0, 8, true);
+                    targetEnemyList.Add(enemyHealth.gameObject);
+                }
+                else
+                {
+                    Debug.Log("stun 1");
+                }
+            }
+
+            if(slicable)
+            {
+                if(targetEnemyList.Count > 1)
+                {
+                    GameObject targetEnemy = new GameObject();
+
+                    float closestAngle = 100f;
+
+                    //calculate which enemy player is facing
+                    foreach (GameObject target in targetEnemyList)
+                    {
+                        Vector3 targetDirection = (target.transform.position - transform.position).normalized;
+
+                        float angle = Vector3.Angle(targetDirection, transform.forward);
+
+                        if(angle < closestAngle)
+                        {
+                            targetEnemy = target;
+                            closestAngle = angle;
+                        }
+                    }
+
+                    foreach (GameObject target in targetEnemyList)
+                    {
+                        if(targetEnemy == target)
+                        {
+                            HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
+                            RotateToTarget(target.transform);
+                            StartCoroutine(Dash(0f));
+                            enemyHealth.Damage(0);
+                        }
+                        else
+                        {
+                            Debug.Log("stun 2");
+                        }
+                    }
+                } 
+                else
+                {
+                    HealthScript enemyHealth = (HealthScript)targetEnemyList[0].GetComponent<HealthScript>();
+                    RotateToTarget(targetEnemyList[0].transform);
+                    StartCoroutine(Dash(0f));
+                    enemyHealth.Damage(0);
+                }
+            }
+        }
+
+        yield return new WaitForSeconds(resetTime);
+        Physics.IgnoreLayerCollision(0, 8, false);
+        isBusy = false;
     }
 
     IEnumerator KnockbackTarget(GameObject target)
     {
+        isBusy = true;
+
         float startTime = Time.time;
 
         Vector3 knockbackDirection = (target.transform.position - transform.position).normalized;
@@ -318,7 +400,9 @@ public class PlayerController : MonoBehaviour
 
             yield return null;
         }
-        //Debug.Log("Get Knocked");
+
         yield return null;
+
+        isBusy = false;
     }
 }
