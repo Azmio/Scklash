@@ -44,8 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b57a22362430b44b38d6eb74f518ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputHandler: {fileID: 0}
   toFollow: {x: 0, y: 0, z: 0}
   Player: {fileID: 0}
+  focusSlider: {fileID: 0}
 --- !u!114 &9164315817037906150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,3 +60,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd1e6e1748904a40be2261691ebe9cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keyBinds: {fileID: 11400000, guid: 7a3ef0be244567b48b97ad17c903b518, type: 2}
