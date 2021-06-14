@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 49861909}
   - component: {fileID: 49861911}
   - component: {fileID: 49861910}
-  m_Layer: 8
+  m_Layer: 5
   m_Name: HealthFG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 49861908}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.6, y: 10, z: 1}
   m_Children: []
   m_Father: {fileID: 990438567}
   m_RootOrder: 1
@@ -65,11 +65,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: f0e56c48958f82e4a9c424c452e61e85, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 289583287}
   - component: {fileID: 289583289}
   - component: {fileID: 289583288}
-  m_Layer: 8
+  m_Layer: 5
   m_Name: HealthBarBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ RectTransform:
   m_GameObject: {fileID: 289583286}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.6, y: 10, z: 1}
   m_Children: []
   m_Father: {fileID: 990438567}
   m_RootOrder: 0
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: f0e56c48958f82e4a9c424c452e61e85, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -162,8 +162,7 @@ GameObject:
   - component: {fileID: 990438570}
   - component: {fileID: 990438569}
   - component: {fileID: 990438568}
-  - component: {fileID: 990438571}
-  m_Layer: 8
+  m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -252,19 +251,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &990438571
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 990438566}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c10d8aea82d6ec54b8d34928f15e5e95, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mCamera: {fileID: 0}
 --- !u!1 &5325715120945023699
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,7 +263,7 @@ GameObject:
   - component: {fileID: 5325715120945023703}
   - component: {fileID: 5325715120945023702}
   - component: {fileID: 5325715120945023697}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -373,7 +359,7 @@ GameObject:
   - component: {fileID: 5325715120978409700}
   - component: {fileID: 5325715120978409703}
   - component: {fileID: 5325715120978409702}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -476,7 +462,7 @@ GameObject:
   - component: {fileID: 248983716}
   - component: {fileID: 248983722}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Ranged Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -550,15 +536,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3705899588ae1ce4e93a331b859abba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRanged: 0
+  isRanged: 1
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
   rangedAttack: {fileID: 0}
   meleeAttack: {fileID: 0}
-  attackRange: 2
-  currentAction: 0
-  changePosition: 1.5
-  timeUntilRanged: 0
+  attackRange: 10
+  currentAction: 2
+  timeUntilPositionChange: 2
+  timeUntilRangedAttack: 0
+  isChangingPosition: 0
 --- !u!114 &248983715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -592,12 +579,11 @@ MonoBehaviour:
   damage: 3
   hitDelay: 1
   timeUntilHit: 0.5
-  isAttacking: 0
   explosionCount: 3
   explosionDelay: 0.5
   currentCount: 0
   explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
-  doneAttacking: 0
+  doneAttacking: 1
 --- !u!114 &248983716
 MonoBehaviour:
   m_ObjectHideFlags: 0
