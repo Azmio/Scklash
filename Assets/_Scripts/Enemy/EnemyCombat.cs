@@ -33,7 +33,7 @@ public class EnemyCombat : MonoBehaviour
     {
         if (timeUntilHit <= 0)
         {
-            GameController.gameController.Player.GetComponent<HealthScript>().Damage((int)meleeDamage);
+            GameController.instance.Player.GetComponent<HealthScript>().Damage((int)meleeDamage);
             timeUntilHit = meleeHitDelay;
         }
         else
@@ -47,7 +47,7 @@ public class EnemyCombat : MonoBehaviour
         
         if (timeUntilHit <= 0 && currentCount< explosionCount)
         {
-            Instantiate(explosionPrefab, GameController.gameController.Player.transform.position, GameController.gameController.Player.transform.rotation);
+            Instantiate(explosionPrefab, GameController.instance.Player.transform.position, GameController.instance.Player.transform.rotation);
             timeUntilHit = explosionDelay;
             currentCount++;
         }
@@ -68,7 +68,7 @@ public class EnemyCombat : MonoBehaviour
     {
         while (currentCount < _count)
         {
-            Instantiate(explosionPrefab, GameController.gameController.Player.transform.position, GameController.gameController.Player.transform.rotation);
+            Instantiate(explosionPrefab, GameController.instance.Player.transform.position, GameController.instance.Player.transform.rotation);
             yield return new WaitForSeconds(_delay);
             currentCount++;
         }
