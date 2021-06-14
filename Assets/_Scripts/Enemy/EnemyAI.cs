@@ -47,14 +47,14 @@ public class EnemyAI : MonoBehaviour
     void AIStateController()
     {
         //rounding off the distance to a decimal with 2 places for more accuracy
-        distance = Mathf.Round(Vector3.Distance(this.gameObject.transform.position, GameController.gameController.toFollow) * 100) / 100;
+        distance = Mathf.Round(Vector3.Distance(this.gameObject.transform.position, GameController.instance.toFollow) * 100) / 100;
 
         //if player is enemy's attack range and melee type
         if (distance <= attackRange && !isRanged)
         {
             currentAction = SpawnerState.MeleeAttack;
 
-            enemyMovement.UpdateDirection(GameController.gameController.toFollow);
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
 
             enemyMovement.agent.velocity = Vector3.zero;
             enemyCombat.MeleeAttack();
@@ -63,7 +63,7 @@ public class EnemyAI : MonoBehaviour
         //if player is in enemy's attack range and ranged type
         else if (distance <= attackRange && isRanged)
         {
-            enemyMovement.UpdateDirection(GameController.gameController.toFollow);
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
 
             //Changes enemy's position after each attack, the enemy gets a time limit in which it can move and if it's done moving it will commence the attack
             if (isChangingPosition && timeUntilRangedAttack >= 0)
@@ -71,7 +71,7 @@ public class EnemyAI : MonoBehaviour
                 currentAction = SpawnerState.Chasing;
               //  Debug.Log("Changing Position");
                 timeUntilRangedAttack -= Time.deltaTime;
-                enemyMovement.MoveToPlayer(GameController.gameController.toFollow, attackRange);
+                enemyMovement.MoveToPlayer(GameController.instance.toFollow, attackRange);
                 return;
             }
             //If the time until attack variable is zero then we set the variables required to commence an attack and reset the last enemy explosion count
@@ -109,8 +109,8 @@ public class EnemyAI : MonoBehaviour
         {
             currentAction = SpawnerState.Chasing;
             enemyCombat.currentCount = 0;
-            enemyMovement.MoveToPlayer(GameController.gameController.toFollow, attackRange);
-            enemyMovement.UpdateDirection(GameController.gameController.toFollow);
+            enemyMovement.MoveToPlayer(GameController.instance.toFollow, attackRange);
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
         }
     }
 }
