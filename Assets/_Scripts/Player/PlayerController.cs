@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour
     private InputHandler inputHandler;
     private CharacterController pController;
     private Camera mCamera;
-    public GameObject item;
     //Local Variables
     public static Transform playerTransform;
     private Quaternion lookDirection;
