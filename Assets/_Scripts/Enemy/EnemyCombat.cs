@@ -47,7 +47,7 @@ public class EnemyCombat : MonoBehaviour
         
         if (timeUntilHit <= 0 && currentCount< explosionCount)
         {
-            Instantiate(explosionPrefab, GameController.instance.Player.transform.position, GameController.instance.Player.transform.rotation);
+            Instantiate(explosionPrefab, GameController.instance.toFollow, GameController.instance.Player.transform.rotation);
             timeUntilHit = explosionDelay;
             currentCount++;
         }

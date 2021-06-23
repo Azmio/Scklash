@@ -205,7 +205,7 @@ GameObject:
   - component: {fileID: 4006593382959120787}
   - component: {fileID: 4648684741968249587}
   m_Layer: 8
-  m_Name: Ranged Enemy
+  m_Name: Melee Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -295,12 +295,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3705899588ae1ce4e93a331b859abba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRanged: 1
+  isRanged: 0
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
-  attackRange: 10
-  currentAction: 2
-  timeUntilPositionChange: 2
+  attackRange: 2
+  currentAction: 0
+  timeUntilPositionChange: 1.5
   timeUntilRangedAttack: 0
   isChangingPosition: 0
 --- !u!114 &4006593382959120787

@@ -33,7 +33,9 @@ public class EnemySpawner : MonoBehaviour
     public float nextWaveCountdown;
     public bool toLoop = false;
 
-    public List<GameObject> enemiesInTheScene; // push in the spawned enemies in here
+    public List<EnemyAI> enemiesInTheScene; // push in the spawned enemies in here
+
+    public List<EnemyAI> UtilityStatesInTheScene;
 
 
     public enum SpawnerState { SPAWNING,WAITING,COUNTING}; // in order to check the current state of the spawner so that it wont mess up
