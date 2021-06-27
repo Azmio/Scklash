@@ -218,15 +218,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3535754320255140036}
-  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 8.71, y: 1, z: 9.91}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3535754320127829142}
   - {fileID: 3535754320666297373}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &3535754320255140034
 CharacterController:
   m_ObjectHideFlags: 0
@@ -296,13 +296,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRanged: 1
+  isFlyBoy: 0
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
+  isUtility: 0
+  enemyHealthSystem: {fileID: 0}
   attackRange: 10
   currentAction: 2
   timeUntilPositionChange: 2
   timeUntilRangedAttack: 0
   isChangingPosition: 0
+  hasTarget: 1
 --- !u!114 &4006593382959120787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,6 +325,9 @@ MonoBehaviour:
   agent: {fileID: 0}
   targetOffset: 0
   changePosition: 0
+  FlyHeight: 2
+  enemyTarget: {fileID: 0}
+  minDistance: 3.4028235e+38
 --- !u!114 &4648684741968249587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,6 +347,7 @@ MonoBehaviour:
   explosionDelay: 0.5
   currentCount: 0
   explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
+  isAttacking: 0
   doneAttacking: 0
 --- !u!1 &3535754320390081013
 GameObject:

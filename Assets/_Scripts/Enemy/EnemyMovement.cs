@@ -19,12 +19,15 @@ public class EnemyMovement : MonoBehaviour
 
     public bool changePosition = false;
 
-    void Start()
-    {
-        InitialiseEnemy();
-    }
+    public float flyHeight = 2f;
 
-    void InitialiseEnemy()//Does what it's intended to do
+    public float floatOffset = 0.5f;
+
+    public EnemyAI enemyTarget;
+
+    float minDistance = float.MaxValue;
+
+    public void InitialiseMovement()//Does what it's intended to do
     {
         //Not sure if we need the character controller anymore but ill let it be
         eController = GetComponent<CharacterController>();
@@ -32,8 +35,10 @@ public class EnemyMovement : MonoBehaviour
 
         //So that the agent won't rotate on it's own and that we could do it via our move to player function
         agent.updateRotation = false;
+
         //Getting a random angle between 0 and 360 and converting it into radian which will be the enemy offset
         GetRandomAngle();
+
 
         //Setting the nav mesh agent's speed as the move speed
         agent.speed = moveSpeed;
@@ -84,4 +89,34 @@ public class EnemyMovement : MonoBehaviour
             targetOffset = _previous + (Random.Range(10, 30) * 0.0174533f * (Random.Range(0, 2) * 2 - 1));
     }
 
+    public void HoverInPlace(float _offset)
+    {
+        agent.enabled = false;
+        // make player float up and down when sitting idle
+        Vector3 temp = transform.position;
+        temp.y= flyHeight + Mathf.Sin(Time.fixedTime * Mathf.PI)*_offset;
+        transform.position = temp;
+    }
+
+    public void FlyToTarget(float attackRange)
+    {
+        UpdateDirection(enemyTarget.transform.position);
+        Vector3 targetDirection = GetTarget(enemyTarget.transform.position, attackRange) - this.transform.position;
+        targetDirection.y = 0;
+        HoverInPlace(floatOffset);
+        eController.Move(targetDirection.normalized * moveSpeed * Time.deltaTime);
+    }
+
+    public void GetTarget()
+    {
+        minDistance = float.MaxValue;
+        foreach (EnemyAI target in EnemySpawner.enemySpawner.UtilityStatesInTheScene)
+        {
+            if(EnemyAI.GetPreciseDistance(this.gameObject.transform.position, target.transform.position)<minDistance)
+            {
+                minDistance = EnemyAI.GetPreciseDistance(this.gameObject.transform.position, target.transform.position);
+                enemyTarget = target;
+            }
+        }
+    }
 }

@@ -115,9 +115,9 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3535754320127829129}
-  m_LocalRotation: {x: 0.29745868, y: -0.13978595, z: 0.044074282, w: 0.9434171}
+  m_LocalRotation: {x: 0.29745874, y: -0.13978595, z: 0.044074304, w: 0.9434171}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.02, y: 0.050000004, z: 0.050000004}
+  m_LocalScale: {x: 0.02, y: 0.049999997, z: 0.05}
   m_Children:
   - {fileID: 3535754319712268414}
   m_Father: {fileID: 3535754320255140035}
@@ -218,15 +218,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3535754320255140036}
-  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 8.71, y: 1, z: 9.91}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3535754320127829142}
   - {fileID: 3535754320666297373}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &3535754320255140034
 CharacterController:
   m_ObjectHideFlags: 0
@@ -295,9 +295,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3705899588ae1ce4e93a331b859abba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRanged: 0
+  enemyType: 1
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
+  isUtility: 0
+  enemyHealthSystem: {fileID: 0}
   attackRange: 2
   currentAction: 0
   timeUntilPositionChange: 1.5
@@ -321,6 +323,10 @@ MonoBehaviour:
   agent: {fileID: 0}
   targetOffset: 0
   changePosition: 0
+  flyHeight: 2
+  floatOffset: 0.5
+  enemyTarget: {fileID: 0}
+  minDistance: 3.4028235e+38
 --- !u!114 &4648684741968249587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,7 +346,9 @@ MonoBehaviour:
   explosionDelay: 0.5
   currentCount: 0
   explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
+  isAttacking: 0
   doneAttacking: 0
+  utilitiesAbsorbed: 0
 --- !u!1 &3535754320390081013
 GameObject:
   m_ObjectHideFlags: 0

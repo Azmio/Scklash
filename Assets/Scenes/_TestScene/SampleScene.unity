@@ -390,17 +390,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8027e3ff0f4b8014f86f2a5834d7a879, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rangedEnemy: {fileID: 3535754320255140036, guid: 8ec13e5c6fbb60446bc24ccc961f29a0, type: 3}
+  meleeEnemy: {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
+  flyBoy: {fileID: 4652786200488287562, guid: fad1b0610b80fad4da10923d5d52256c, type: 3}
   waves:
   - name: First Wave
     count: 5
     spawnDelay: 1
-    rangedEnemy: {fileID: 3535754320255140036, guid: 8ec13e5c6fbb60446bc24ccc961f29a0, type: 3}
-    meleeEnemy: {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
   - name: Second Wave
     count: 0
     spawnDelay: 1
-    rangedEnemy: {fileID: 0}
-    meleeEnemy: {fileID: 0}
   spawnPoints: []
   waveDelay: 1
   waveNumber: 0
@@ -980,7 +979,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -265.00003, y: -202}
+  m_AnchoredPosition: {x: -265, y: -202}
   m_SizeDelta: {x: -523.7, y: -379.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &951415732
@@ -1191,7 +1190,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -264.50003, y: -182.40002}
+  m_AnchoredPosition: {x: -264.5, y: -182.40002}
   m_SizeDelta: {x: -523.7, y: -379.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1283742120
@@ -1452,7 +1451,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1702546727}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.15, y: 1, z: 0}
+  m_LocalPosition: {x: 13.15, y: 0.918, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 73707886}
