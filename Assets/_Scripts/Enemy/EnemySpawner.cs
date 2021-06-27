@@ -5,7 +5,9 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     public static EnemySpawner enemySpawner;
-
+    public GameObject rangedEnemy;
+    public GameObject meleeEnemy;
+    public GameObject flyBoy;
 
     [System.Serializable]
     public class EnemyWave
@@ -14,8 +16,8 @@ public class EnemySpawner : MonoBehaviour
         public int count; // number of enemies that we want in each wave
        // public GameObject enemyPrefab; //useful if we want to add different type of enemies
         public float spawnDelay; // delay between each consecutive enemy spawn
-        public GameObject rangedEnemy;
-        public GameObject meleeEnemy;
+
+
     }
 
     //discarded enemy type class which was used by the spawnrate based spawner
@@ -124,11 +126,15 @@ public class EnemySpawner : MonoBehaviour
         {
             if (i % 5 == 0)
             {
-                SpawnEnemy(wave.rangedEnemy);
+                SpawnEnemy(rangedEnemy);
+            }
+            else if (i % 3 == 0)
+            {
+                SpawnEnemy(flyBoy);
             }
             else
             {
-                SpawnEnemy(wave.meleeEnemy);
+                SpawnEnemy(meleeEnemy);
             }
             
             yield return new WaitForSeconds(wave.spawnDelay);
@@ -169,7 +175,7 @@ public class EnemySpawner : MonoBehaviour
 
 
 
-    void SpawnEnemy(GameObject _enemy)
+    public void SpawnEnemy(GameObject _enemy)
     {
         Transform _t = spawnPoints[Random.Range(1, spawnPoints.Length)];
         Instantiate(_enemy, _t.position, _t.rotation);
