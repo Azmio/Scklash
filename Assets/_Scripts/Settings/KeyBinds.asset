@@ -14,8 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   keyBindChecks:
   - action: 0
-    keyCode: 32
-  - action: 1
     keyCode: 323
-  - action: 2
-    keyCode: 324
+  - action: 1
+    keyCode: 32

@@ -40,7 +40,8 @@ public class GameController : MonoBehaviour
     void Update()
     {
         UpdateToFollow(isPlayerDashing);
-        focusSlider.value = Player.GetComponent<PlayerController>().focus;
+        
+        //Player.GetComponent<PlayerController>().focus = //Utility State enemies in list
     }
 
     void UpdateToFollow(bool dashCheck)
