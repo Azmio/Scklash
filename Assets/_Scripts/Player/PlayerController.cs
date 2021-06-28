@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
-{    
+{
+    [Tooltip("Camera Distance not in use")]
+
     private InputHandler inputHandler;
     private CharacterController pController;
     private Camera mCamera;
@@ -14,32 +16,45 @@ public class PlayerController : MonoBehaviour
     private PlayerActions action;
     
     //Player movement/Rotation Values
+    [Header("Player Movement")]
     public float rotationSpeed = 10f;
     public float moveSpeed = 5f;
+    [Range(0, 7.5f)] public float moveSpeedModifier = 0f;
     public float cameraDistance = 15f;
-
+    private Vector3 targetVector;
     private float hitDistance = 100f;
+    private bool canMove = true;
 
     //Player Abilities
+    [Header("Ability Active")]
     public bool isBusy; //Currently preforming an action
+
     //Focus bar
+    [Header("Current Focus")]
     public int focus;
+
     //Dash
+    [Header("Dash Values")]
     public float dashTime = 0.3f;
     public float dashSpeed = 20f;
     public float dashResetTime = 0.3f;
+
     //Basic Attack
+    [Header("Basic Attack Values")]
     public float attackRange = 3f;
     [Range(0, 360)] public float attackArc = 150f;
     public float attackResetTime = 1f;
-    public List<GameObject> targetList;
+    [HideInInspector]public List<GameObject> targetList;
     public int attackDamage = 10;
     public int attackDamageMultiplier = 1;
+    
     //Attack Combo
     private float lastAttackTime, lastHoldTime;
     private int comboCounter;
     public float maxComboDelay = 0.9f;
+
     //Hold Attack
+    [Header("KnockBack Values")]
     [SerializeField] private bool isHolding;
     [SerializeField] private bool isSpamming;
     public float holdDetect = 0.1f;
@@ -62,23 +77,23 @@ public class PlayerController : MonoBehaviour
     }
         
     void Update()
-    {     
-        Vector3 targetVector = new Vector3(inputHandler.movementVector.x, 0f, inputHandler.movementVector.z);//Input converted into Vector3
-        MoveToTarget(targetVector);
+    {
+
+
+        if (canMove)
+        {
+            targetVector = new Vector3(inputHandler.movementVector.x, 0f, inputHandler.movementVector.z);//Input converted into Vector3
+            MoveToTarget(targetVector, false);
+        }
+    
         //RotateToTarget(targetVector);
 
         float timeHeld = Time.time - lastHoldTime;
-        //Debug.Log(timeHeld);
-        if (inputHandler.GetKeyDown(PlayerActions.Dash) && !isBusy)
-        {
-            StartCoroutine(Dash(dashResetTime));
-            //Debug.Log("DAAAAAAAASSSSHHHHH");
-        }
 
         if(inputHandler.GetKeyDown(PlayerActions.Attack) && !isBusy)
         {
             lastHoldTime = Time.time;
-            RotateToClickLocation();
+            //RotateToClickLocation();
             isHolding = false;
         }
 
@@ -89,6 +104,7 @@ public class PlayerController : MonoBehaviour
         else if (inputHandler.GetKeyUp(PlayerActions.Attack) && !isBusy && !isHolding)
         {
             //Face Click Location
+            //RotateToClickLocation();
             isHolding = false;
             StartCoroutine(Attack(attackResetTime));
         }
@@ -113,10 +129,10 @@ public class PlayerController : MonoBehaviour
             }
         }     
 
-        if (inputHandler.GetKeyDown(PlayerActions.Thrust) && !isBusy)
+        if (inputHandler.GetKeyDown(PlayerActions.Slash) && !isBusy)
         {
-            RotateToClickLocation();
-            StartCoroutine(Thrust(attackResetTime));
+            //RotateToClickLocation();
+            StartCoroutine(Slash(attackResetTime));
         }
 
 
@@ -125,32 +141,54 @@ public class PlayerController : MonoBehaviour
             comboCounter = 0;   
     }
 
-    private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
+    Vector3 lastPosition = Vector3.zero;
+    void FixedUpdate()
     {
-        float speed = moveSpeed * Time.deltaTime;
-        target = Quaternion.Euler(0f, mCamera.transform.eulerAngles.y, 0f) * target;
-        pController.Move(target * speed);   
+        float sp = (transform.position - lastPosition).magnitude;
+        lastPosition = transform.position;
 
-        if (target != Vector3.zero) //If input ongoing, update player rotation
+        //Debug.Log("Speedz: " + sp);
+    }
+
+    private void MoveToTarget(Vector3 target, bool step) //Move and then rotate character to target direction
+    {
+        float stepSpeed;
+
+        if (step)
+            stepSpeed = 10f;
+        else
+            stepSpeed = 1f;
+
+
+        float speed = (moveSpeed + moveSpeedModifier) * stepSpeed * Time.deltaTime;
+        target = Quaternion.Euler(0f, mCamera.transform.eulerAngles.y, 0f) * target;
+
+        pController.Move(target.normalized * speed);   
+
+        if (target != Vector3.zero && !isBusy) //If input ongoing, update player rotation
         {
             lookDirection = Quaternion.LookRotation(target);
             pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed);
         }
     }    
 
-    private void RotateToClickLocation()
+    private Vector3 RotateToClickLocation()
     {   
         //Character rotate to mouse on screen position
         Plane plane = new Plane(Vector3.up, transform.position);
         Ray ray = mCamera.ScreenPointToRay(Input.mousePosition);
 
-        if(plane.Raycast(ray, out hitDistance))
+        if (plane.Raycast(ray, out hitDistance))
         {
             //Debug.DrawRay(ray.origin, ray.direction * hitDistance, Color.red);            
             Vector3 targetPoint = ray.GetPoint(hitDistance);
-            lookDirection = Quaternion.LookRotation(targetPoint-transform.position);
-            pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed*100f);
+            lookDirection = Quaternion.LookRotation(targetPoint - transform.position);
+            pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed * 100f);
+
+            return targetPoint;
         }
+        else
+            return Vector3.zero;
     }
 
     private void RotateToTarget(Transform target)
@@ -208,9 +246,13 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator Attack(float resetTime)
     {
+        canMove = false;
         isBusy = true;
+        //targetVector = Vector3.zero;
+        
         //Animate
         attackDamageMultiplier = 1;
+        MoveToTarget(RotateToClickLocation(), true);
 
         /**if (colliders.Length > 0)
         {
@@ -291,14 +333,15 @@ public class PlayerController : MonoBehaviour
 
                 enemyHealth.Damage(attackDamage * attackDamageMultiplier);
 
-                focus += 10 * attackDamageMultiplier;
+                //focus += 10 * attackDamageMultiplier;
                 Debug.Log("Attacked: " + target.name + " / Current Health: " + enemyHealth.GetHealth() + " / Target facing: " + targetFacing + " / Damage Done: " + attackDamage * attackDamageMultiplier);
             }
         }
         else
             comboCounter = 0;
 
-
+        yield return new WaitForSeconds(0.2f);
+        canMove = true;
 
         attackDamageMultiplier = 1;  
         //Debug.Log("Attack Reset Time: " + resetTime);
@@ -307,83 +350,97 @@ public class PlayerController : MonoBehaviour
         isBusy = false;
     }
 
-    IEnumerator Thrust(float resetTime)
+    IEnumerator Slash(float resetTime)
     {
         isBusy = true;
-        
+
         bool slicable = false;
 
-        if (detectAttackable(attackRange, 50))
-        {
-            List<GameObject> targetEnemyList = new List<GameObject>();
+        yield return null;
 
-            foreach (GameObject target in targetList)
-            {
-                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
 
-                if(enemyHealth.currentHealth/enemyHealth.maxHealth <= 0.35f)
-                {
-                    slicable = true;
-                    Physics.IgnoreLayerCollision(0, 8, true);
-                    targetEnemyList.Add(enemyHealth.gameObject);
-                }
-                else
-                {
-                    Debug.Log("stun 1");
-                }
-            }
 
-            if(slicable)
-            {
-                if(targetEnemyList.Count > 1)
-                {
-                    GameObject targetEnemy = new GameObject();
-
-                    float closestAngle = 100f;
-
-                    //calculate which enemy player is facing
-                    foreach (GameObject target in targetEnemyList)
-                    {
-                        Vector3 targetDirection = (target.transform.position - transform.position).normalized;
-
-                        float angle = Vector3.Angle(targetDirection, transform.forward);
-
-                        if(angle < closestAngle)
-                        {
-                            targetEnemy = target;
-                            closestAngle = angle;
-                        }
-                    }
-
-                    foreach (GameObject target in targetEnemyList)
-                    {
-                        if(targetEnemy == target)
-                        {
-                            HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
-                            RotateToTarget(target.transform);
-                            StartCoroutine(Dash(0f));
-                            enemyHealth.Damage(0);
-                        }
-                        else
-                        {
-                            Debug.Log("stun 2");
-                        }
-                    }
-                } 
-                else
-                {
-                    HealthScript enemyHealth = (HealthScript)targetEnemyList[0].GetComponent<HealthScript>();
-                    RotateToTarget(targetEnemyList[0].transform);
-                    StartCoroutine(Dash(0f));
-                    enemyHealth.Damage(0);
-                }
-            }
-        }
-
-        yield return new WaitForSeconds(resetTime);
-        Physics.IgnoreLayerCollision(0, 8, false);
-        isBusy = false;
     }
+
+        /**IEnumerator Thrust(float resetTime)
+        {
+            isBusy = true;
+            
+            bool slicable = false;
+
+            if (detectAttackable(attackRange, 50))
+            {
+                List<GameObject> targetEnemyList = new List<GameObject>();
+
+                foreach (GameObject target in targetList)
+                {
+                    HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
+
+                    if(enemyHealth.currentHealth/enemyHealth.maxHealth <= 0.35f)
+                    {
+                        slicable = true;
+                        Physics.IgnoreLayerCollision(0, 8, true);
+                        targetEnemyList.Add(enemyHealth.gameObject);
+                    }
+                    else
+                    {
+                        Debug.Log("stun 1");
+                    }
+                }
+
+                if(slicable)
+                {
+                    if(targetEnemyList.Count > 1)
+                    {
+                        GameObject targetEnemy = new GameObject();
+
+                        float closestAngle = 100f;
+
+                        //calculate which enemy player is facing
+                        foreach (GameObject target in targetEnemyList)
+                        {
+                            Vector3 targetDirection = (target.transform.position - transform.position).normalized;
+
+                            float angle = Vector3.Angle(targetDirection, transform.forward);
+
+                            if(angle < closestAngle)
+                            {
+                                targetEnemy = target;
+                                closestAngle = angle;
+                            }
+                        }
+
+                        foreach (GameObject target in targetEnemyList)
+                        {
+                            if(targetEnemy == target)
+                            {
+                                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
+                                RotateToTarget(target.transform);
+                                StartCoroutine(Dash(0f));
+                                enemyHealth.Damage(0);
+                            }
+                            else
+                            {
+                                Debug.Log("stun 2");
+                            }
+                        }
+                    } 
+                    else
+                    {
+                        HealthScript enemyHealth = (HealthScript)targetEnemyList[0].GetComponent<HealthScript>();
+                        RotateToTarget(targetEnemyList[0].transform);
+                        StartCoroutine(Dash(0f));
+                        enemyHealth.Damage(0);
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(resetTime);
+            Physics.IgnoreLayerCollision(0, 8, false);
+            isBusy = false;
+        }
+        */
+
 
     IEnumerator KnockbackTarget(GameObject target)
     {

@@ -88,8 +88,7 @@ public class InputHandler : MonoBehaviour
 }
 
 public enum PlayerActions
-{
-    Dash,
+{    
     Attack,
-    Thrust
+    Slash
 }
