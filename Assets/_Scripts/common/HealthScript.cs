@@ -8,6 +8,7 @@ public class HealthScript : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
+    public GameObject healthBarCanvas;
     public Slider healthSlider;
 
     void Awake()    
@@ -19,35 +20,17 @@ public class HealthScript : MonoBehaviour
             healthSlider.value = currentHealth;
         }
 
-
-
     }
 
     private void Update()
     {
         //Damage(0); //Test destroy to avoid update check
-
-        healthSlider.value = currentHealth;
-    }
-
-    void InitializeIfEnemy()
-    {
-        if (gameObject.tag == "Enemy")
-        {
-            EnemySpawner.enemySpawner.enemiesInTheScene.Add(this.gameObject);
-        }
     }
 
     private void OnDestroy()
     {
         //do something fancy
-
-        if (this.tag == "Enemy")
-        {
-            EnemySpawner.enemySpawner.enemiesInTheScene.Remove(this.gameObject);
-        }
-
-        Debug.Log(gameObject.name + " DED");
+       // Debug.Log(gameObject.name + " DED");
     }
 
     public int GetHealth()
@@ -61,8 +44,8 @@ public class HealthScript : MonoBehaviour
 
         healthSlider.value = currentHealth;
 
-        if (currentHealth <= 0) //If health depleted, destroy this object
-            Destroy(gameObject);
+       // if (currentHealth <= 0) //If health depleted, destroy this object
+       //   Destroy(gameObject);
 
         
     }
