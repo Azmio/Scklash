@@ -41,10 +41,11 @@ public class PlayerController : MonoBehaviour
 
     //Basic Attack
     [Header("Basic Attack Values")]
-    public float attackRange = 3f;
+    public float attackRange = 5f;
     [Range(0, 360)] public float attackArc = 150f;
     public float attackResetTime = 1f;
-    [HideInInspector]public List<GameObject> targetList;
+    //[HideInInspector]
+    public List<GameObject> targetList;
     public int attackDamage = 10;
     public int attackDamageMultiplier = 1;
     
@@ -52,6 +53,10 @@ public class PlayerController : MonoBehaviour
     private float lastAttackTime, lastHoldTime;
     private int comboCounter;
     public float maxComboDelay = 0.9f;
+
+    [Header("Slash Attack")]
+    public float slashRange = 5f;
+    [Range(0, 360)] public float slashArc = 50f;
 
     //Hold Attack
     [Header("KnockBack Values")]
@@ -78,12 +83,18 @@ public class PlayerController : MonoBehaviour
         
     void Update()
     {
-
-
         if (canMove)
         {
             targetVector = new Vector3(inputHandler.movementVector.x, 0f, inputHandler.movementVector.z);//Input converted into Vector3
-            MoveToTarget(targetVector, false);
+            MoveToTarget(targetVector);
+        }
+        else
+        {
+            Vector3 currentPos = new Vector3();
+
+            currentPos = playerTransform.position;
+
+            transform.position = currentPos;
         }
     
         //RotateToTarget(targetVector);
@@ -100,6 +111,7 @@ public class PlayerController : MonoBehaviour
         if (inputHandler.GetKeyUp(PlayerActions.Attack) && isHolding)
         {
             isHolding = false;
+            isBusy = false;
         }
         else if (inputHandler.GetKeyUp(PlayerActions.Attack) && !isBusy && !isHolding)
         {
@@ -123,6 +135,7 @@ public class PlayerController : MonoBehaviour
                     foreach(GameObject enemy in targetList)
                     {
                         StartCoroutine(KnockbackTarget(enemy));
+                        isBusy = true;
                         Debug.Log("Boop");
                     }
                 }
@@ -150,17 +163,10 @@ public class PlayerController : MonoBehaviour
         //Debug.Log("Speedz: " + sp);
     }
 
-    private void MoveToTarget(Vector3 target, bool step) //Move and then rotate character to target direction
+    private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
     {
-        float stepSpeed;
-
-        if (step)
-            stepSpeed = 10f;
-        else
-            stepSpeed = 1f;
-
-
-        float speed = (moveSpeed + moveSpeedModifier) * stepSpeed * Time.deltaTime;
+ 
+        float speed = (moveSpeed + moveSpeedModifier) * Time.deltaTime;
         target = Quaternion.Euler(0f, mCamera.transform.eulerAngles.y, 0f) * target;
 
         pController.Move(target.normalized * speed);   
@@ -193,7 +199,7 @@ public class PlayerController : MonoBehaviour
 
     private void RotateToTarget(Transform target)
     {
-        lookDirection = Quaternion.LookRotation(target.position);
+        lookDirection = Quaternion.LookRotation(target.position - transform.position);
         pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed*100f);
     }
 
@@ -252,7 +258,7 @@ public class PlayerController : MonoBehaviour
         
         //Animate
         attackDamageMultiplier = 1;
-        MoveToTarget(RotateToClickLocation(), true);
+        RotateToClickLocation();
 
         /**if (colliders.Length > 0)
         {
@@ -356,90 +362,66 @@ public class PlayerController : MonoBehaviour
 
         bool slicable = false;
 
-        yield return null;
+        RotateToClickLocation();
+        
 
-
-
-    }
-
-        /**IEnumerator Thrust(float resetTime)
+        if (detectAttackable(slashRange, slashArc))
         {
-            isBusy = true;
-            
-            bool slicable = false;
+            List<GameObject> targetEnemyList = new List<GameObject>();
 
-            if (detectAttackable(attackRange, 50))
+            foreach (GameObject target in targetList)
             {
-                List<GameObject> targetEnemyList = new List<GameObject>();
+                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
 
-                foreach (GameObject target in targetList)
+                if (enemyHealth.currentHealth <= 0) //Enemy should be in utility state
                 {
-                    HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
-
-                    if(enemyHealth.currentHealth/enemyHealth.maxHealth <= 0.35f)
-                    {
-                        slicable = true;
-                        Physics.IgnoreLayerCollision(0, 8, true);
-                        targetEnemyList.Add(enemyHealth.gameObject);
-                    }
-                    else
-                    {
-                        Debug.Log("stun 1");
-                    }
-                }
-
-                if(slicable)
-                {
-                    if(targetEnemyList.Count > 1)
-                    {
-                        GameObject targetEnemy = new GameObject();
-
-                        float closestAngle = 100f;
-
-                        //calculate which enemy player is facing
-                        foreach (GameObject target in targetEnemyList)
-                        {
-                            Vector3 targetDirection = (target.transform.position - transform.position).normalized;
-
-                            float angle = Vector3.Angle(targetDirection, transform.forward);
-
-                            if(angle < closestAngle)
-                            {
-                                targetEnemy = target;
-                                closestAngle = angle;
-                            }
-                        }
-
-                        foreach (GameObject target in targetEnemyList)
-                        {
-                            if(targetEnemy == target)
-                            {
-                                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
-                                RotateToTarget(target.transform);
-                                StartCoroutine(Dash(0f));
-                                enemyHealth.Damage(0);
-                            }
-                            else
-                            {
-                                Debug.Log("stun 2");
-                            }
-                        }
-                    } 
-                    else
-                    {
-                        HealthScript enemyHealth = (HealthScript)targetEnemyList[0].GetComponent<HealthScript>();
-                        RotateToTarget(targetEnemyList[0].transform);
-                        StartCoroutine(Dash(0f));
-                        enemyHealth.Damage(0);
-                    }
+                    targetEnemyList.Add(enemyHealth.gameObject);
+                    slicable = true;
+                    Physics.IgnoreLayerCollision(0, 8, true);
+                    StartCoroutine(Dash(0f));
                 }
             }
 
-            yield return new WaitForSeconds(resetTime);
-            Physics.IgnoreLayerCollision(0, 8, false);
-            isBusy = false;
+            if (slicable)
+            {
+                //Become temp invuln
+                if (targetEnemyList.Count > 1)
+                {
+                    GameObject targetEnemy = new GameObject();
+                    float dist = 100f;
+
+                    foreach(GameObject target in targetEnemyList)
+                    {
+                        if(Vector3.Distance(transform.position, target.transform.position) < dist)
+                        {
+                            targetEnemy = target;
+                        }
+                    }
+
+                    
+                    //RotateToTarget(targetEnemy.transform);
+                    
+
+                    //Set off utility state explosion
+                }
+                else
+                {
+                    //Physics.IgnoreLayerCollision(0, 8, true);
+                    RotateToTarget(targetEnemyList[0].transform);
+                    StartCoroutine(Dash(0f));
+
+                    //Set off utility state explosion
+                }
+            }
         }
-        */
+
+        yield return new WaitForSeconds(resetTime);
+        Physics.IgnoreLayerCollision(0, 8, false);
+        isBusy = false;
+
+    }
+
+     
 
 
     IEnumerator KnockbackTarget(GameObject target)

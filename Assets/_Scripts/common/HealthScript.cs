@@ -7,7 +7,6 @@ public class HealthScript : MonoBehaviour
 {
     public int maxHealth = 100;
     public int currentHealth;
-
     public GameObject healthBarCanvas;
     public Slider healthSlider;
 
