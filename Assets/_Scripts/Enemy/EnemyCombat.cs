@@ -4,26 +4,35 @@ using UnityEngine;
 
 public class EnemyCombat : MonoBehaviour
 {
-    //Damage of each melee attack
-    public float meleeDamage = 3f;
+    //Damage of each attack
+    public float damage = 3f;
 
-    //time delay between each melee hit
-    public float meleeHitDelay = 1f;
+    //time delay between each hit
+    public float strikeDelay = 1.5f;
 
     //time until the next hit
     public float timeUntilHit = 0;
+
+    //time left until the utility is absorbed
+    public float timeUntilAbsorption = 5;
+
+    //time required to absorb
+    public float timeRequiredToAbsorb = 5f;
 
     //Number of explosions per attack
     public int explosionCount = 3;
 
     //delay between each explosion
-    public float explosionDelay = 0.5f;
 
     //Number of explosions done already
     public float currentCount = 0;
 
     //prefab of explosion object
     public GameObject explosionPrefab;
+
+    public GameObject projectilePrefab;
+
+    public GameObject damageZonePrefab;
 
     public bool isAttacking = false;
 
@@ -32,16 +41,18 @@ public class EnemyCombat : MonoBehaviour
 
     public int utilitiesAbsorbed = 0;
 
-    public float knockBackSpeed = 2f;
+    public float knockBackSpeed = 20f;
+
+    public bool isBusy = false;
 
     public void MeleeAttack()
     {
         if (timeUntilHit <= 0)
         {
             isAttacking = true;
-            GameController.instance.Player.GetComponent<HealthScript>().Damage((int)meleeDamage);
+            GameController.instance.Player.GetComponent<HealthScript>().Damage((int)damage);
             //StartCoroutine(KnockbackTarget(GameController.instance.Player));
-            timeUntilHit = meleeHitDelay;
+            timeUntilHit = strikeDelay;
         }
         else
         {
@@ -50,6 +61,21 @@ public class EnemyCombat : MonoBehaviour
         }
     }
 
+
+    public IEnumerator BigChungusAttack()
+    {
+        isBusy = true;
+        DamageZone damageZone = Instantiate(damageZonePrefab, transform.position, transform.rotation).GetComponent<DamageZone>();
+        damageZone.damage = damage;
+
+        yield return new WaitForSeconds(strikeDelay);
+
+        isBusy = false;
+        isAttacking = false;
+        
+    }
+
+    //obsolete
     public void RangedAttack()
     {
         
@@ -57,7 +83,7 @@ public class EnemyCombat : MonoBehaviour
         {
             isAttacking = true;
             Instantiate(explosionPrefab, GameController.instance.toFollow, GameController.instance.Player.transform.rotation);
-            timeUntilHit = explosionDelay;
+            timeUntilHit = strikeDelay;
             currentCount++;
         }
         else if (currentCount < explosionCount)
@@ -71,21 +97,41 @@ public class EnemyCombat : MonoBehaviour
             timeUntilHit -= Time.deltaTime;
         }
     }
-    
-    public void StealUtility(EnemyAI _target)
+
+    public void ShootProjectile()
     {
         if (timeUntilHit <= 0)
         {
+            isAttacking = true;
+            Debug.Log("Kashoot!");
+            GameObject temp = Instantiate(projectilePrefab, this.transform.position, this.transform.rotation);
+            temp.GetComponent<Projectile>().projectileDamage=damage;
+            //temp.projectileDamage = this.damage;
+            timeUntilHit = strikeDelay;
+            doneAttacking = true;
+        }
+        else
+        {
+            isAttacking = false;
+            doneAttacking = false;
+            timeUntilHit -= Time.deltaTime;
+        }
+    }
+    
+    public void StealUtility(EnemyAI _target)
+    {
+        if (timeUntilAbsorption <= 0)
+        {
             _target.DestroyUtility();
             utilitiesAbsorbed++;
-            timeUntilHit = 5;
+            timeUntilAbsorption = timeRequiredToAbsorb;
             doneAttacking = true;
 
         }
         else
         {
             doneAttacking = false;
-            timeUntilHit -= Time.deltaTime;
+            timeUntilAbsorption -= Time.deltaTime;
         }
     }
 
@@ -100,18 +146,18 @@ public class EnemyCombat : MonoBehaviour
         }
     }
 
-    IEnumerator KnockbackTarget(GameObject target)
+    IEnumerator KnockbackTarget(GameObject target,Vector3 _knockbackDir)
     {
-        isAttacking = true;
 
+        Debug.Log("oki knockbacking daddy uwu");
         float startTime = Time.time;
 
         Vector3 knockbackDirection = (target.transform.position - transform.position).normalized;
 
-        while (Time.time < startTime )
+        while (Time.time < startTime + 0.2 )
         {
-            target.GetComponent<CharacterController>().Move(knockbackDirection * knockBackSpeed * Time.deltaTime);
-
+            // target.GetComponent<CharacterController>().Move(knockbackDirection * knockBackSpeed * Time.deltaTime);
+            target.GetComponent<CharacterController>().Move(_knockbackDir * knockBackSpeed * Time.deltaTime);
             yield return null;
         }
 
@@ -119,4 +165,38 @@ public class EnemyCombat : MonoBehaviour
 
         isAttacking = false;
     }
+
+    public IEnumerator LeapAtTarget(CharacterController _controller, float _leapSpeed, float _leapDuration, PlayerController _target)
+    {
+        Debug.Log("leaping uwu");
+
+        yield return new WaitForSeconds(1.5f);
+
+        float startTime = Time.time;
+        float distanceCheck;
+
+        while (Time.time < startTime + _leapDuration)
+        {
+            _controller.Move(transform.forward * _leapSpeed * Time.deltaTime);
+            distanceCheck = EnemyAI.GetPreciseDistance(_target.transform.position, this.transform.position);
+            // Debug.Log("distance is"+distanceCheck);
+
+            if (distanceCheck <= 1.4 && !isAttacking)
+            {
+                //damage the player
+                Debug.Log("KnockBack player uwu");
+                _target.GetComponent<HealthScript>().Damage((int)damage);
+                isAttacking = true;
+                StartCoroutine(KnockbackTarget(_target.gameObject, transform.forward));
+            }
+            yield return null;
+        }
+
+        doneAttacking = false;
+        isBusy = false;
+
+    }
+
+
+
 }

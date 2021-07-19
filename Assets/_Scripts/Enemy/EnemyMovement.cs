@@ -17,15 +17,20 @@ public class EnemyMovement : MonoBehaviour
     //an offset which is nothing but a random angle that will be used to position the enemy on a random point which will be in the attack radius
     public float targetOffset;
 
-    public bool changePosition = false;
 
     public float flyHeight = 2f;
 
     public float floatOffset = 0.5f;
 
-    public EnemyAI enemyTarget;
+    public GameObject enemyTarget;
+
+    public Vector3 targetPosition= Vector3.zero;
 
     float minDistance = float.MaxValue;
+
+    public bool isFlying = false;
+
+    public bool isChangingPosition = false;
 
     public void InitialiseMovement()//Does what it's intended to do
     {
@@ -44,11 +49,12 @@ public class EnemyMovement : MonoBehaviour
         agent.speed = moveSpeed;
     }
 
-    public void MoveToPlayer(Vector3 target,float _attackRange) //Give the navmesh agent a target point
+    public void MoveToTarget(Vector3 target,float _attackRange) //Give the navmesh agent a target point
     {
         agent.destination = GetTarget(target, _attackRange);
         return;
     }
+
 
     public void UpdateDirection(Vector3 target)
     {
@@ -68,10 +74,9 @@ public class EnemyMovement : MonoBehaviour
 
     // A function that would assign the player's target as a point that is around the player within the attack range instead of the player itself
     // thus making the enemies seem like they surround the player and also decrease the clutter where the enemies try and push each other when in large groups
-    Vector3 GetTarget(Vector3 _target, float _attackRange)
+    public Vector3 GetTarget(Vector3 _target, float _attackRange)
     {
         Vector3 temp = Vector3.zero;
-
         // using the equation of circle, getting a point on the circumference of the circle based on an offset that is a randomised value for each enemy
         temp.x = _target.x + (_attackRange * Mathf.Cos(targetOffset));
 
@@ -83,10 +88,11 @@ public class EnemyMovement : MonoBehaviour
     //Give a Random offset angle in radian if previous value was nil otherwise give an angle that is 5-30 degrees greater or lesser
     public void GetRandomAngle(float _previous=0)
     {
+        //Debug.Log("Changing angle");
         if (_previous == 0)
             targetOffset = Random.Range(0, 360) * 0.0174533f;
         else
-            targetOffset = _previous + (Random.Range(10, 30) * 0.0174533f * (Random.Range(0, 2) * 2 - 1));
+            targetOffset = _previous + (Random.Range(15, 30) * 0.0174533f * (Random.Range(0, 2) * 2 - 1));
     }
 
     public void HoverInPlace(float _offset)
@@ -101,22 +107,90 @@ public class EnemyMovement : MonoBehaviour
     public void FlyToTarget(float attackRange)
     {
         UpdateDirection(enemyTarget.transform.position);
-        Vector3 targetDirection = GetTarget(enemyTarget.transform.position, attackRange) - this.transform.position;
+        targetPosition = GetTarget(enemyTarget.transform.position, attackRange);
+        Vector3 targetDirection = targetPosition - this.transform.position;
         targetDirection.y = 0;
         HoverInPlace(floatOffset);
         eController.Move(targetDirection.normalized * moveSpeed * Time.deltaTime);
     }
 
-    public void GetTarget()
+    public void GetUtilityTarget()
     {
         minDistance = float.MaxValue;
-        foreach (EnemyAI target in EnemySpawner.enemySpawner.UtilityStatesInTheScene)
+        foreach (EnemyAI target in EnemySpawner.instance.UtilityStatesInTheScene)
         {
             if(EnemyAI.GetPreciseDistance(this.gameObject.transform.position, target.transform.position)<minDistance)
             {
                 minDistance = EnemyAI.GetPreciseDistance(this.gameObject.transform.position, target.transform.position);
-                enemyTarget = target;
+                enemyTarget = target.gameObject;
             }
         }
+    }
+    
+    public IEnumerator Fly(float _time,float _smoothingVar)
+    {
+        Debug.Log("Making the enemy fly");
+        isFlying = true;
+        float controlVar = 0;
+        float increment = _smoothingVar / _time;
+        Vector3 temp;
+        while (controlVar<=1)
+        {
+            temp = this.gameObject.transform.position;
+            temp.y = Mathf.Lerp(1, flyHeight, controlVar);
+            this.gameObject.transform.position = temp;
+
+            controlVar += increment;
+
+            yield return new WaitForSeconds(_smoothingVar);
+        }
+
+        yield return new WaitForSeconds(_time / 2);
+        //changingYPosition = false;
+    }
+
+    public IEnumerator Land(float _time, float _smoothingVar)
+    {
+        Debug.Log("Making the enemy land");
+        float startHeight = this.gameObject.transform.position.y;
+        float controlVar = 0;
+        float increment = _smoothingVar / _time;
+        isFlying = false;
+        Vector3 temp;
+        while (controlVar <= 1)
+        {
+            temp = this.gameObject.transform.position;
+
+            temp.y = Mathf.Lerp(startHeight,1.08f, controlVar);
+
+            this.gameObject.transform.position = temp;
+
+            controlVar += increment;
+
+            yield return new WaitForSeconds(_smoothingVar);
+        }
+
+        yield return new WaitForSeconds(_time / 2);
+        //changingYPosition = false;
+    }
+
+
+    public bool IsAtTarget(Vector3 _target)
+    {
+        float tempDistance = EnemyAI.GetPreciseDistance(this.gameObject.transform.position, _target);
+        //Debug.Log("Is at target distance " + tempDistance);
+        if ( tempDistance<= 1)
+            return true;
+        return false;
+    }
+
+    public static Vector3 GetRandomDirection()
+    {
+        return new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+    }
+
+    public static Vector3 GetRandomPoint(Vector3 _currentPosition)
+    {
+        return _currentPosition + GetRandomDirection() * Random.Range(5f, 10f);
     }
 }

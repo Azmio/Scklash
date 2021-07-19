@@ -261,6 +261,7 @@ MonoBehaviour:
   currentHealth: 0
   healthBarCanvas: {fileID: 0}
   healthSlider: {fileID: 3535754319712268401}
+  safeDistance: 0
 --- !u!195 &6028449098269015802
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -270,7 +271,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3535754320255140036}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.7
+  m_Radius: 0.8
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 20
@@ -298,13 +299,9 @@ MonoBehaviour:
   enemyType: 1
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
-  isUtility: 0
   enemyHealthSystem: {fileID: 0}
   attackRange: 2
   currentAction: 0
-  timeUntilPositionChange: 1.5
-  timeUntilRangedAttack: 0
-  isChangingPosition: 0
 --- !u!114 &4006593382959120787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -317,16 +314,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07a93786ba0787c4db3f64106e603316, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  turnSpeed: 3
+  moveSpeed: 6
+  turnSpeed: 4
   eController: {fileID: 0}
   agent: {fileID: 0}
   targetOffset: 0
-  changePosition: 0
   flyHeight: 2
   floatOffset: 0.5
   enemyTarget: {fileID: 0}
-  minDistance: 3.4028235e+38
+  targetPosition: {x: 0, y: 0, z: 0}
+  isFlying: 0
+  isChangingPosition: 0
 --- !u!114 &4648684741968249587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -339,16 +337,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7809c60ff1a69742bd9100aacc44bd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meleeDamage: 3
-  meleeHitDelay: 1
+  damage: 3
+  strikeDelay: 1.5
   timeUntilHit: 0.5
+  timeUntilAbsorption: 5
+  timeRequiredToAbsorb: 5
   explosionCount: 3
-  explosionDelay: 0.5
   currentCount: 0
   explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
+  projectilePrefab: {fileID: 0}
   isAttacking: 0
   doneAttacking: 0
   utilitiesAbsorbed: 0
+  knockBackSpeed: 30
+  isBusy: 0
 --- !u!1 &3535754320390081013
 GameObject:
   m_ObjectHideFlags: 0

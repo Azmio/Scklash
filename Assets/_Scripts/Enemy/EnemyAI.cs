@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    public enum State { Chasing, MeleeAttack, RangedAttack, Utility, Idle, StealingUtility };
+    public enum State { Chasing, MeleeAttack, RangedAttack, Utility, Idle, StealingUtility, ChangingPosition, Roaming };
 
-    public enum Type { Ranged, Melee, FlyBoy, Utility};
+    public enum Type { Ranged, Melee, FlyBoy, Utility, BigChungus };
 
     public Type enemyType;
 
@@ -24,13 +24,6 @@ public class EnemyAI : MonoBehaviour
     //Shows the current action
     public State currentAction;
 
-    public float timeUntilPositionChange = 1.5f;
-
-    public float timeUntilRangedAttack = 0;
-
-    public bool isChangingPosition = false;
-    
-    // Start is called before the first frame update
 
     private void Awake()
     {
@@ -55,9 +48,9 @@ public class EnemyAI : MonoBehaviour
     void InitializeIfEnemy()
     {
         enemyHealthSystem.healthBarCanvas = this.transform.Find("Canvas").gameObject;
-        EnemySpawner.enemySpawner.enemiesInTheScene.Add(this);
+        EnemySpawner.instance.enemiesInTheScene.Add(this);
     }
- 
+
     //Function that manages the AI states
 
     void AIStateController()
@@ -75,6 +68,9 @@ public class EnemyAI : MonoBehaviour
                 break;
             case Type.FlyBoy:
                 FlyBoyActions();
+                break;
+            case Type.BigChungus:
+                BigChungusActions();
                 break;
         }
         return;
@@ -100,7 +96,7 @@ public class EnemyAI : MonoBehaviour
                 {
                     while (enemyCombat.utilitiesAbsorbed > 0)
                     {
-                        EnemySpawner.enemySpawner.SpawnEnemy(EnemySpawner.enemySpawner.meleeEnemy);
+                        EnemySpawner.instance.SpawnEnemy(EnemySpawner.instance.meleeEnemy);
                         enemyCombat.utilitiesAbsorbed--;
                     }
                 }
@@ -117,51 +113,139 @@ public class EnemyAI : MonoBehaviour
 
     public void DestroyUtility()
     {
-        EnemySpawner.enemySpawner.UtilityStatesInTheScene.Remove(this);
+        EnemySpawner.instance.UtilityStatesInTheScene.Remove(this);
         Destroy(this.gameObject);
     }
-
-    void FlyBoyActions()
+    void RangedActions()
     {
-        if (EnemySpawner.enemySpawner.UtilityStatesInTheScene.Count == 0)
+        //rounding off the distance to a decimal with 2 places for more accuracy
+        distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
+        if (distance <= attackRange)
         {
-            currentAction = State.Idle;
-            enemyMovement.HoverInPlace(enemyMovement.floatOffset);
-            return;
-        }
-        
-        if (enemyMovement.enemyTarget == null)
-        {
-            enemyMovement.GetTarget();
-            enemyCombat.doneAttacking = false;
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+
+            //If enemy is changing position and done attacking
+            if (enemyMovement.isChangingPosition && enemyCombat.doneAttacking)
+            {
+                //In order to grab new target according to the new offset
+                enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
+
+                //check if player is at target place
+                if (enemyMovement.IsAtTarget(enemyMovement.agent.destination))
+                {
+                    //Stop moving, and commence attack
+                    enemyMovement.isChangingPosition = false;
+                    enemyCombat.doneAttacking = false;
+                    enemyMovement.GetRandomAngle(enemyMovement.targetOffset);
+                    return;
+                }
+                currentAction = State.ChangingPosition;
+            }
+            else if (!enemyCombat.doneAttacking)
+            {
+                currentAction = State.RangedAttack;
+                enemyMovement.agent.velocity = Vector3.zero;
+                enemyCombat.ShootProjectile();
+                enemyMovement.isChangingPosition = true;
+
+            }
         }
         else
         {
-            distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.enemyTarget.transform.position);
+            currentAction = State.Chasing;
+            // enemyCombat.currentCount = 0;
+            enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+        }
+    }
+    void FlyBoyActions()
+    {
+        //ranged enemy behaviour when there are no utility states
+        if (EnemySpawner.instance.UtilityStatesInTheScene.Count == 0)
+        {
+            enemyMovement.enemyTarget = GameController.instance.Player.gameObject;
+            distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
 
-            if (distance <= attackRange)
+            //reset time required to hit
+            if (distance <= attackRange * 7)
             {
-                currentAction = State.StealingUtility;
-                Debug.Log("stealing life");
-                enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
-                enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
+                enemyMovement.UpdateDirection(GameController.instance.toFollow);
 
-                if (!enemyCombat.doneAttacking)
+                //If enemy is changing position and done attacking
+                if (enemyMovement.isChangingPosition && enemyCombat.doneAttacking)
                 {
-                    enemyCombat.StealUtility(enemyMovement.enemyTarget);
-                }
+                    //In order to grab new target according to the new offset  
+                    currentAction = State.ChangingPosition;
+                    enemyCombat.timeUntilHit = enemyCombat.strikeDelay;
+                    enemyMovement.FlyToTarget(attackRange * 7);
+                    //check if player is at target place                 
+                    if (enemyMovement.IsAtTarget(enemyMovement.targetPosition))
+                    {
+                        enemyMovement.isChangingPosition = false;
+                        enemyCombat.doneAttacking = false;
+                        //Stop moving, and commence attack
+                        enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
+                        return;
+                    }
 
+                }
+                else if (!enemyCombat.doneAttacking)
+                {
+                    currentAction = State.RangedAttack;
+                    enemyCombat.ShootProjectile();
+                    enemyMovement.GetRandomAngle(enemyMovement.targetOffset);
+                    enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
+                    enemyMovement.isChangingPosition = true;
+                }
             }
             else
             {
-                //fly to the utility
                 currentAction = State.Chasing;
-                enemyMovement.FlyToTarget(attackRange);
+                // enemyCombat.currentCount = 0;
+                enemyMovement.FlyToTarget(attackRange * 7);
+                enemyMovement.UpdateDirection(GameController.instance.toFollow);
             }
-        }
 
-        //get random utility target or wait by floating up and down xD
-        //fly to random utility target
+        }//if there are utility states
+        else if (EnemySpawner.instance.UtilityStatesInTheScene.Count > 0)
+        {
+            if (enemyMovement.enemyTarget == GameController.instance.Player.gameObject)
+            {
+                enemyMovement.enemyTarget = null;
+            }
+            if (enemyMovement.enemyTarget == null)
+            {
+                enemyMovement.GetUtilityTarget();
+                enemyCombat.doneAttacking = false;
+            }
+            else
+            {
+
+                distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.enemyTarget.transform.position);
+
+                if (distance <= attackRange)
+                {
+                    currentAction = State.StealingUtility;
+                    Debug.Log("stealing life");
+                    enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
+                    enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
+
+                    if (!enemyCombat.doneAttacking)
+                    {
+                        enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>());
+                    }
+
+                }
+                else
+                {
+                    //fly to the utility
+                    currentAction = State.Chasing;
+                    enemyMovement.FlyToTarget(attackRange);
+                }
+
+            }
+
+        }
         return;
     }
     void UtilityActions()
@@ -172,6 +256,35 @@ public class EnemyAI : MonoBehaviour
 
     void MeleeActions()
     {
+        distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
+        if (distance <= attackRange)
+        {
+            currentAction = State.MeleeAttack;
+            
+            //enemyMovement.agent.velocity = Vector3.zero;
+            if (enemyMovement.IsAtTarget(enemyMovement.agent.destination))
+            {
+                enemyMovement.agent.velocity = Vector3.zero;
+                if (!enemyCombat.doneAttacking)
+                {
+                    enemyCombat.doneAttacking = true;
+                    enemyCombat.isBusy = true;
+                    enemyMovement.agent.destination = this.gameObject.transform.position;
+                    StartCoroutine(enemyCombat.LeapAtTarget(enemyMovement.eController, 20f, 0.2f, GameController.instance.Player));                
+                }
+            }
+
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+        }
+        else if(!enemyCombat.isBusy)
+        {
+            currentAction = State.Chasing;
+            enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+        }
+    }
+    void MeleeActionsOld()
+    {
         //rounding off the distance to a decimal with 2 places for more accuracy
         distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
         if (distance <= attackRange)
@@ -184,71 +297,84 @@ public class EnemyAI : MonoBehaviour
         else
         {
             currentAction = State.Chasing;
-            enemyMovement.MoveToPlayer(GameController.instance.toFollow, attackRange);
+            enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
             enemyMovement.UpdateDirection(GameController.instance.toFollow);
         }
     }
-    void RangedActions()
+
+    void BigChungusActions()
     {
-        //rounding off the distance to a decimal with 2 places for more accuracy
-        distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
-        if (distance <= attackRange)
+        //if player is stunned
+        if (enemyCombat.isBusy)
         {
-            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+            currentAction = State.Idle;
+            return;
+        }
+           
+        
 
-            //Changes enemy's position after each attack, the enemy gets a time limit in which it can move and if it's done moving it will commence the attack
-            if (isChangingPosition && timeUntilRangedAttack >= 0)
+        if (GameController.instance.Player.gameObject.GetComponent<HealthScript>().CheckIfVulnerable())
+        {
+            distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
+            if (distance <= attackRange && !enemyCombat.isBusy)
             {
-                currentAction = State.Chasing;
-                //  Debug.Log("Changing Position");
-                timeUntilRangedAttack -= Time.deltaTime;
-                enemyMovement.MoveToPlayer(GameController.instance.toFollow, attackRange);
-                return;
-            }
-            //If the time until attack variable is zero then we set the variables required to commence an attack and reset the last enemy explosion count
-            else if (timeUntilRangedAttack <= 0)
-            {
-                currentAction = State.RangedAttack;
-                // Debug.Log("Done changing position");
-                isChangingPosition = false;
-                enemyCombat.doneAttacking = false;
-                enemyCombat.currentCount = 0;
-                timeUntilRangedAttack = timeUntilPositionChange;
-            }
-            //If enemy is done attacking we change it's state to chasing and provide it with a new offset where the enemy moves
-            else if (enemyCombat.doneAttacking)
-            {
-                currentAction = State.Chasing;
+                currentAction = State.MeleeAttack;
+                enemyMovement.UpdateDirection(GameController.instance.toFollow);
+                enemyMovement.agent.velocity = Vector3.zero;
+                if (!enemyCombat.isAttacking)
+                {
+                    enemyCombat.isAttacking = true;
+                    enemyMovement.agent.destination = this.transform.position;
+                    StartCoroutine(enemyCombat.BigChungusAttack());
+                }
 
-                enemyMovement.GetRandomAngle(enemyMovement.targetOffset);
 
-                //this variable is set true and checked by the initial if statement 
-                isChangingPosition = true;
             }
-
-            //If the enemy isn't done attacking we start with the ranged attack after setting the enemy's velocity to zero so that it wont move while attacking
             else
             {
-                //  Debug.Log("Attacking");
-                enemyCombat.RangedAttack();
-                enemyMovement.agent.velocity = Vector3.zero;
+                currentAction = State.Chasing;
+                enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
+                enemyMovement.UpdateDirection(GameController.instance.toFollow);
             }
         }
         else
         {
-            currentAction = State.Chasing;
-            enemyCombat.currentCount = 0;
-            enemyMovement.MoveToPlayer(GameController.instance.toFollow, attackRange);
-            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+            //Get random point on screen to follow and roam
+            currentAction = State.Roaming;
+            if (enemyMovement.targetPosition == Vector3.zero)
+            {
+                enemyMovement.targetPosition =EnemyMovement.GetRandomPoint(this.gameObject.transform.position);
+            }
+
+
+            distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.targetPosition);
+
+
+            if (distance < 1.5f)
+            {
+                enemyMovement.targetPosition = EnemyMovement.GetRandomPoint(this.gameObject.transform.position);
+            }
+            else
+            {
+                enemyMovement.MoveToTarget(enemyMovement.targetPosition, 0f);
+                enemyMovement.UpdateDirection(enemyMovement.targetPosition);
+            }
+            
         }
+
+        
     }
+
     void ChangeToUtility()
     {
+        enemyCombat.StopAllCoroutines();
         enemyMovement.agent.destination = this.gameObject.transform.position;
+        enemyMovement.agent.enabled = false;
         enemyMovement.enabled = false;
         enemyCombat.enabled = false;
-        EnemySpawner.enemySpawner.enemiesInTheScene.Remove(this);
-        EnemySpawner.enemySpawner.UtilityStatesInTheScene.Add(this);
+        enemyHealthSystem.currentHealth = 100;
+        EnemySpawner.instance.enemiesInTheScene.Remove(this);
+        EnemySpawner.instance.UtilityStatesInTheScene.Add(this);
         currentAction = State.Utility;
         enemyHealthSystem.healthBarCanvas.SetActive(false);
         //Debug.Log(EnemySpawner.enemySpawner.UtilityStatesInTheScene[0]);
@@ -259,70 +385,6 @@ public class EnemyAI : MonoBehaviour
         _b.y = 0;
         return Mathf.Round(Vector3.Distance(_a, _b) * 100) / 100;
     }
-    //Obsolete stuff
-
-    /*
-        //rounding off the distance to a decimal with 2 places for more accuracy
-        distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow); 
-
-        //if player is enemy's attack range and melee type
-        if (distance <= attackRange && !isRanged)
-        {
-            currentAction = State.MeleeAttack;
-            enemyMovement.UpdateDirection(GameController.instance.toFollow);
-            enemyMovement.agent.velocity = Vector3.zero;
-            enemyCombat.MeleeAttack();
-        }
-        //if player is in enemy's attack range and ranged type
-        else if (distance <= attackRange && isRanged)
-        {
-            enemyMovement.UpdateDirection(GameController.instance.toFollow);
-
-            //Changes enemy's position after each attack, the enemy gets a time limit in which it can move and if it's done moving it will commence the attack
-            if (isChangingPosition && timeUntilRangedAttack >= 0)
-            {
-                currentAction = State.Chasing;
-              //  Debug.Log("Changing Position");
-                timeUntilRangedAttack -= Time.deltaTime;
-                enemyMovement.MoveToPlayer(GameController.instance.toFollow, attackRange);
-                return;
-            }
-            //If the time until attack variable is zero then we set the variables required to commence an attack and reset the last enemy explosion count
-            else if (timeUntilRangedAttack <= 0)
-            {
-                currentAction = State.RangedAttack;
-               // Debug.Log("Done changing position");
-                isChangingPosition = false;
-                enemyCombat.doneAttacking = false;
-                enemyCombat.currentCount = 0;
-                timeUntilRangedAttack = timeUntilPositionChange;
-            }
-            //If enemy is done attacking we change it's state to chasing and provide it with a new offset where the enemy moves
-            else if (enemyCombat.doneAttacking)
-            {
-                currentAction = State.Chasing;
-
-                enemyMovement.GetRandomAngle(enemyMovement.targetOffset);
-
-                //this variable is set true and checked by the initial if statement 
-                isChangingPosition = true;
-            }
-
-            //If the enemy isn't done attacking we start with the ranged attack after setting the enemy's velocity to zero so that it wont move while attacking
-            else
-            {
-              //  Debug.Log("Attacking");
-                enemyCombat.RangedAttack();
-                enemyMovement.agent.velocity = Vector3.zero;
-            }
-        }
-        //if enemy is not in attack range
-        else
-        {
-            currentAction = State.Chasing;
-            enemyCombat.currentCount = 0;
-            enemyMovement.MoveToPlayer(GameController.instance.toFollow, attackRange);
-            enemyMovement.UpdateDirection(GameController.instance.toFollow);
-        }
-     */
 }
+
+

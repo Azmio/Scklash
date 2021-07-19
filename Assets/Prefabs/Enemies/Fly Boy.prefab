@@ -87,9 +87,21 @@ PrefabInstance:
       propertyPath: flyHeight
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 4006593382959120787, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
+      propertyPath: isChangingPosition
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4648684741968249587, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
       propertyPath: timeUntilHit
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4648684741968249587, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
+      propertyPath: projectilePrefab
+      value: 
+      objectReference: {fileID: 2234940398615667336, guid: 2a9bb54c8b7bf1a4bb0c312e7426c314, type: 3}
+    - target: {fileID: 6028449098269015802, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
+      propertyPath: m_Radius
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 6028449098269015802, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
       propertyPath: m_Enabled

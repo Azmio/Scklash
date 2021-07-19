@@ -393,6 +393,7 @@ MonoBehaviour:
   rangedEnemy: {fileID: 3535754320255140036, guid: 8ec13e5c6fbb60446bc24ccc961f29a0, type: 3}
   meleeEnemy: {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
   flyBoy: {fileID: 4652786200488287562, guid: fad1b0610b80fad4da10923d5d52256c, type: 3}
+  bigChungus: {fileID: 3535754320255140036, guid: d1741605ac1d1934cbab2c1ee2bea540, type: 3}
   waves:
   - name: First Wave
     count: 5
@@ -1418,6 +1419,7 @@ GameObject:
   - component: {fileID: 1702546731}
   - component: {fileID: 1702546730}
   - component: {fileID: 1702546732}
+  - component: {fileID: 1702546733}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1438,7 +1440,7 @@ CharacterController:
   serializedVersion: 2
   m_Height: 2
   m_Radius: 0.5
-  m_SlopeLimit: 45
+  m_SlopeLimit: 5
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
@@ -1451,7 +1453,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1702546727}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.15, y: 0.918, z: 0}
+  m_LocalPosition: {x: 13.15, y: 1.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 73707886}
@@ -1472,6 +1474,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 10
   moveSpeed: 5
+  moveSpeedModifier: 0
   cameraDistance: 0
   isBusy: 0
   focus: 123
@@ -1504,6 +1507,7 @@ MonoBehaviour:
   currentHealth: 0
   healthBarCanvas: {fileID: 0}
   healthSlider: {fileID: 931977206}
+  safeDistance: 1.5
 --- !u!82 &1702546732
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1600,6 +1604,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!208 &1702546733
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702546727}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.56, y: 1, z: 0.56}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &1856804041
 GameObject:
   m_ObjectHideFlags: 0
@@ -1721,7 +1741,7 @@ Terrain:
   m_DrawTreesAndFoliage: 1
   m_StaticShadowCaster: 0
   m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 10652, guid: 0000000000000000f000000000000000, type: 0}
+  m_MaterialTemplate: {fileID: 2100000, guid: 594ea882c5a793440b60ff72d896021e, type: 2}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -1802,7 +1822,7 @@ PrefabInstance:
     - target: {fileID: 9164315817037906151, guid: 5b4d98f87b6cb1242a212d989ce81f5c, type: 3}
       propertyPath: Player
       value: 
-      objectReference: {fileID: 1702546727}
+      objectReference: {fileID: 1702546730}
     - target: {fileID: 9164315817037906151, guid: 5b4d98f87b6cb1242a212d989ce81f5c, type: 3}
       propertyPath: focusSlider
       value: 
