@@ -12,7 +12,7 @@ public class GameController : MonoBehaviour
     static public bool isPlayerDashing;
 
     public Vector3 toFollow;
-    public GameObject Player;
+    public PlayerController Player;
 
     //GUI
     public Slider focusSlider;
@@ -50,7 +50,7 @@ public class GameController : MonoBehaviour
         {
             return;// if player is dashing dont give the current position of the player to the enemy and return the old one
         }
-        toFollow = Player.transform.position;
+        toFollow = Player.gameObject.transform.position;
     }
 
     // will refactor this as we progress, this was a basic test

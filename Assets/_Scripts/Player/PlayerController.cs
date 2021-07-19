@@ -25,9 +25,11 @@ public class PlayerController : MonoBehaviour
     private float hitDistance = 100f;
     private bool canMove = true;
 
+
     //Player Abilities
     [Header("Ability Active")]
     public bool isBusy; //Currently preforming an action
+
 
     //Focus bar
     [Header("Current Focus")]
@@ -81,6 +83,7 @@ public class PlayerController : MonoBehaviour
         isSpamming = false;
     }
         
+
     void Update()
     {
         if (canMove)
@@ -203,7 +206,9 @@ public class PlayerController : MonoBehaviour
         pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed*100f);
     }
 
-    IEnumerator Dash(float resetTime)
+
+
+    public IEnumerator Dash(float resetTime)
     {
         float startTime = Time.time;
         

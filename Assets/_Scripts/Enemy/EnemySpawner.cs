@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public static EnemySpawner enemySpawner;
+    public static EnemySpawner instance;
     public GameObject rangedEnemy;
     public GameObject meleeEnemy;
     public GameObject flyBoy;
+    public GameObject bigChungus;
 
     [System.Serializable]
     public class EnemyWave
@@ -42,11 +43,19 @@ public class EnemySpawner : MonoBehaviour
 
     public enum SpawnerState { SPAWNING,WAITING,COUNTING}; // in order to check the current state of the spawner so that it wont mess up
     public SpawnerState state = SpawnerState.COUNTING;
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this);
+        }
+        else
+            Destroy(this);
+    }
     private void Start()
     {
-        
         //check if we have at least one wave and one spawn point
-        enemySpawner = this;
         spawnPoints = gameObject.GetComponentsInChildren<Transform>();
         nextWaveCountdown = waveDelay;
         CheckParameters();
@@ -127,6 +136,10 @@ public class EnemySpawner : MonoBehaviour
             if (i % 5 == 0)
             {
                 SpawnEnemy(rangedEnemy);
+            }
+            else if (i % 4 == 0)
+            {
+                SpawnEnemy(bigChungus);
             }
             else if (i % 3 == 0)
             {

@@ -10,6 +10,8 @@ public class HealthScript : MonoBehaviour
     public GameObject healthBarCanvas;
     public Slider healthSlider;
 
+    public float safeDistance;
+
     void Awake()    
     {
         currentHealth = maxHealth; //Ensure on spawn health is at max
@@ -65,6 +67,29 @@ public class HealthScript : MonoBehaviour
 
         healthSlider.value = currentHealth;
 
+    }
+
+    public bool CheckIfVulnerable()
+    {
+        if (EnemySpawner.instance.UtilityStatesInTheScene.Count == 0)
+            return true;
+        else
+        {
+            float minDistance = float.MaxValue;
+            foreach (EnemyAI utility in EnemySpawner.instance.UtilityStatesInTheScene)
+            {
+                float currentDis = EnemyAI.GetPreciseDistance(this.gameObject.transform.position, utility.transform.position);
+                if (currentDis < minDistance)
+                {
+                    minDistance = currentDis;
+                }
+            }
+            if (minDistance <= safeDistance)
+                return false;
+            else
+                return true;
+
+        }
     }
 
 }
