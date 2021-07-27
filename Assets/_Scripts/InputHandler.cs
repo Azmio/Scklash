@@ -25,13 +25,10 @@ public class InputHandler : MonoBehaviour
 
     void Update()
     {
-        //Player movement input
-        float x = Input.GetAxis("Horizontal");
+        //Player movement input WASD
+        float x = Input.GetAxis("Horizontal"); 
         float z = Input.GetAxis("Vertical");
-        movementVector = new Vector3(x, 0f, z);
-
-        //Player mouse input
-
+        movementVector = new Vector3(x, 0f, z); //apply movement
     }
 
     public KeyCode GetKeyCode(PlayerActions currentAction) //Check key Code
@@ -87,7 +84,7 @@ public class InputHandler : MonoBehaviour
     }
 }
 
-public enum PlayerActions
+public enum PlayerActions //Player Abilities to key bind
 {    
     Attack,
     Slash

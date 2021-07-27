@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
-    static public GameController instance;
+    static public GameController instance; //Only 1 instance remain active
 
-    public InputHandler inputHandler;
+    public InputHandler inputHandler; //Player Controls
 
     static public bool isPlayerDashing;
 
@@ -18,8 +18,7 @@ public class GameController : MonoBehaviour
     public Slider focusSlider;
 
 
-    // Start is called before the first frame update
-    void Awake()
+    void Awake() //Set up
     {
         if (instance == null)
         {
@@ -31,15 +30,9 @@ public class GameController : MonoBehaviour
             Destroy(this);
     }
 
-    private void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        UpdateToFollow(isPlayerDashing);
+        //UpdateToFollow(isPlayerDashing);
         
         //Player.GetComponent<PlayerController>().focus = //Utility State enemies in list
     }
@@ -50,6 +43,7 @@ public class GameController : MonoBehaviour
         {
             return;// if player is dashing dont give the current position of the player to the enemy and return the old one
         }
+
         toFollow = Player.gameObject.transform.position;
     }
 
