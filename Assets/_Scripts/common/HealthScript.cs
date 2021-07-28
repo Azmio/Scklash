@@ -9,18 +9,20 @@ public class HealthScript : MonoBehaviour
     public int currentHealth;
     public GameObject healthBarCanvas;
     public Slider healthSlider;
-
+    public bool invulnerable;
     public float safeDistance;
 
     void Awake()    
     {
         currentHealth = maxHealth; //Ensure on spawn health is at max
+
         if (healthSlider != null)
         {
             healthSlider.maxValue = maxHealth;
             healthSlider.value = currentHealth;
         }
 
+        invulnerable = false;
     }
 
     private void Update()
@@ -34,26 +36,26 @@ public class HealthScript : MonoBehaviour
        // Debug.Log(gameObject.name + " DED");
     }
 
-    public int GetHealth()
+    public int GetHealth() //Return Health Check
     {
         return currentHealth;
     }
 
-    public void Damage(int amount)
+    public void Damage(int amount) //Damage this Object
     {
-        currentHealth -= amount;
-
-        healthSlider.value = currentHealth;
+        if(!invulnerable) //Check if able to damage
+        {
+            currentHealth -= amount;
+            healthSlider.value = currentHealth;
+        }       
 
        // if (currentHealth <= 0) //If health depleted, destroy this object
        //   Destroy(gameObject);
-
-        
     }
 
     public void Heal(int amount)
     {
-        if (amount <= 0)//Full heal
+        if (amount <= 0) //Full heal
             currentHealth = maxHealth;
         else
         {

@@ -86,52 +86,51 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (canMove)
+        float timeHeld;
+
+        if (isHolding)
+            timeHeld = Time.time - lastHoldTime;
+
+        if (canMove) //player is able to move
         {
-            targetVector = new Vector3(inputHandler.movementVector.x, 0f, inputHandler.movementVector.z);//Input converted into Vector3
+            targetVector = new Vector3(inputHandler.movementVector.x, 0f, inputHandler.movementVector.z); //Input converted into Vector3
+
             MoveToTarget(targetVector);
         }
         else
         {
             Vector3 currentPos = new Vector3();
 
-            currentPos = playerTransform.position;
+            currentPos = playerTransform.position; //Pause player position if cannot move
 
             transform.position = currentPos;
-        }
-    
-        //RotateToTarget(targetVector);
+        }        
 
-        float timeHeld = Time.time - lastHoldTime;
-
-        if(inputHandler.GetKeyDown(PlayerActions.Attack) && !isBusy)
+        if(inputHandler.GetKeyDown(PlayerActions.Attack) && !isBusy) //Detect Main Attack Button Down - Default : LM Button
         {
-            lastHoldTime = Time.time;
-            //RotateToClickLocation();
+            lastHoldTime = Time.time; //Record Time
             isHolding = false;
         }
 
-        if (inputHandler.GetKeyUp(PlayerActions.Attack) && isHolding)
+        if (inputHandler.GetKeyUp(PlayerActions.Attack) && isHolding) //Detect Main Attack Button Up
         {
             isHolding = false;
             isBusy = false;
         }
-        else if (inputHandler.GetKeyUp(PlayerActions.Attack) && !isBusy && !isHolding)
+        else if (inputHandler.GetKeyUp(PlayerActions.Attack) && !isBusy && !isHolding) //If not Holding, excecute normal attack
         {
-            //Face Click Location
-            //RotateToClickLocation();
             isHolding = false;
             StartCoroutine(Attack(attackResetTime));
         }
-        else if (inputHandler.GetKey(PlayerActions.Attack) && !isBusy)
+        else if (inputHandler.GetKey(PlayerActions.Attack) && !isBusy) //If Attack Button is active
         {
-            if (Time.time - lastHoldTime > holdDetect && !isHolding)
+            if (Time.time - lastHoldTime > holdDetect && !isHolding) //Determine if player is holding button
             {
                 isHolding = true;
-                Debug.Log("Held: " + Time.time + " :: " + lastHoldTime + " :: " + (Time.time - lastHoldTime));
+                //Debug.Log("Held: " + Time.time + " :: " + lastHoldTime + " :: " + (Time.time - lastHoldTime));
             }
 
-            if(isHolding)
+            if(isHolding) //Excute Knockback in arc range
             {
                 if(detectAttackable(attackRange, attackArc))
                 {
@@ -139,32 +138,26 @@ public class PlayerController : MonoBehaviour
                     {
                         StartCoroutine(KnockbackTarget(enemy));
                         isBusy = true;
-                        Debug.Log("Boop");
                     }
                 }
             }
         }     
 
-        if (inputHandler.GetKeyDown(PlayerActions.Slash) && !isBusy)
+        if (inputHandler.GetKeyDown(PlayerActions.Slash) && !isBusy) //Slash Target - Default : RM Button
         {
-            //RotateToClickLocation();
             StartCoroutine(Slash(attackResetTime));
         }
-
-
         
-        if (comboCounter >= 1 && (Time.time - lastAttackTime) > maxComboDelay)        
+        if (comboCounter >= 1 && (Time.time - lastAttackTime) > maxComboDelay) //Combo Counter timer check 
             comboCounter = 0;   
     }
-
+    /**
     Vector3 lastPosition = Vector3.zero;
     void FixedUpdate()
     {
         float sp = (transform.position - lastPosition).magnitude;
         lastPosition = transform.position;
-
-        //Debug.Log("Speedz: " + sp);
-    }
+    }*/
 
     private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
     {
@@ -206,18 +199,21 @@ public class PlayerController : MonoBehaviour
         pController.transform.rotation = Quaternion.RotateTowards(transform.rotation, lookDirection, rotationSpeed*100f);
     }
 
-
-
-    public IEnumerator Dash(float resetTime)
+    Vector3 TargetFacing(Vector3 targetDirection, Vector3 origin)
     {
-        float startTime = Time.time;
+        return (targetDirection - origin).normalized;
+    }
+
+    public IEnumerator Dash(float resetTime) //Dash Ability
+    {
+        float startTime = Time.time; //Set initial time stamp
         
         isBusy = true;
         GameController.isPlayerDashing = true;
 
         //Animate
 
-        while (Time.time < startTime + dashTime)
+        while (Time.time < startTime + dashTime) //Move player for duration
         {
             pController.Move(pController.transform.forward * dashSpeed * Time.deltaTime);
 
@@ -230,7 +226,7 @@ public class PlayerController : MonoBehaviour
         
     }
 
-    private bool detectAttackable(float range, float Arc)
+    private bool detectAttackable(float range, float Arc) //Detect any attackable objects within arc settings
     {
         Collider[] colliders = Physics.OverlapSphere(transform.position, range, 1 << 8); //create sphere around player with radius of 3
         targetList = new List<GameObject>();
@@ -239,8 +235,8 @@ public class PlayerController : MonoBehaviour
         {
             foreach (Collider target in colliders)
             {
-                Vector3 targetDirection = (target.transform.position - transform.position).normalized;
-                float angle = Vector3.Angle(targetDirection, transform.forward);
+                //Vector3 targetDirection = (target.transform.position - transform.position).normalized;
+                float angle = Vector3.Angle(TargetFacing(target.transform.position, transform.position), transform.forward);
 
                 if (angle <= Arc / 2)
                 {
@@ -255,67 +251,14 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    IEnumerator Attack(float resetTime)
+    IEnumerator Attack(float resetTime) //Attack Ability
     {
         canMove = false;
         isBusy = true;
-        //targetVector = Vector3.zero;
         
         //Animate
         attackDamageMultiplier = 1;
         RotateToClickLocation();
-
-        /**if (colliders.Length > 0)
-        {
-            //float currentTime = Time.time;        
-            comboCounter++;
-            lastAttackTime = Time.time;
-            Debug.Log("Combo: " + comboCounter);
-
-            foreach (Collider target in colliders)
-            {
-                Vector3 targetDirection = (target.transform.position - transform.position).normalized;
-
-                float angle = Vector3.Angle(targetDirection, transform.forward);
-                //Debug.Log(target.name + ": " + targetDirection + "   Angle:" + angle);
-
-                if (angle <= attackArc/2)
-                {
-                    HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
-
-                    Vector3 targetFacing = (enemyHealth.transform.forward - transform.position).normalized;
-
-                    if (enemyHealth.GetHealth() > 0 && comboCounter == 4)
-                    {
-                        attackDamageMultiplier += 2;
-                        Debug.Log("Combo Attack Complete");
-                        yield return KnockbackTarget(enemyHealth.gameObject);
-                        resetTime = 0.5f;
-                        comboCounter = 0;
-                    }
-
-                    if(Vector3.Dot(targetFacing, transform.forward) < 0.05f)
-                    {
-                        attackDamageMultiplier += 2;
-                        Debug.Log("Sneak Attack Multiplier Added");
-                    }
-
-                    enemyHealth.Damage(attackDamage * attackDamageMultiplier);
-                    //Debug.Log("Target facing: " + Vector3.Dot(targetFacing, transform.forward));                    
-                    yield return null;
-                }
-                else
-                {
-                    //Debug.Log("Enemy Not within attack angle");
-                    yield return null;
-                }
-            }
-        }
-        else
-        {
-            //Debug.Log("No Target In Range");
-            comboCounter = 0;
-        }*/
 
         if (detectAttackable(attackRange, attackArc))
         {
@@ -324,10 +267,10 @@ public class PlayerController : MonoBehaviour
 
             foreach (GameObject target in targetList)
             {
-                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
-                Vector3 targetFacing = (enemyHealth.transform.forward - transform.position).normalized;
+                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>(); //Acquire enemy health information
+                //Vector3 targetFacing = (enemyHealth.transform.forward - transform.position).normalized; //Check target facing
 
-                if (enemyHealth.GetHealth() > 0 && comboCounter == 4)
+                if (enemyHealth.GetHealth() > 0 && comboCounter == 4) //Combo modifier added
                 {
                     attackDamageMultiplier *= 2;
                     Debug.Log("Combo Attack Complete");
@@ -336,16 +279,15 @@ public class PlayerController : MonoBehaviour
                     comboCounter = 0;
                 }
 
-                if (Vector3.Dot(targetFacing, transform.forward) < 0.05f)
+                if (Vector3.Dot(TargetFacing(enemyHealth.transform.forward, transform.position), transform.forward) < 0.05f) //Sneak modifier added
                 {
                     attackDamageMultiplier *= 2;
                     Debug.Log("Sneak Attack Multiplier Added");
                 }
 
-                enemyHealth.Damage(attackDamage * attackDamageMultiplier);
+                enemyHealth.Damage(attackDamage * attackDamageMultiplier); //Apply Final Damage
 
-                //focus += 10 * attackDamageMultiplier;
-                Debug.Log("Attacked: " + target.name + " / Current Health: " + enemyHealth.GetHealth() + " / Target facing: " + targetFacing + " / Damage Done: " + attackDamage * attackDamageMultiplier);
+                //Debug.Log("Attacked: " + target.name + " / Current Health: " + enemyHealth.GetHealth() + " / Target facing: " + targetFacing + " / Damage Done: " + attackDamage * attackDamageMultiplier);
             }
         }
         else
@@ -361,16 +303,15 @@ public class PlayerController : MonoBehaviour
         isBusy = false;
     }
 
-    IEnumerator Slash(float resetTime)
+    IEnumerator Slash(float resetTime) //Slash Ability
     {
         isBusy = true;
 
         bool slicable = false;
 
-        RotateToClickLocation();
-        
+        RotateToClickLocation();        
 
-        if (detectAttackable(slashRange, slashArc))
+        if (detectAttackable(slashRange, slashArc)) //Detect Potential Slash Targets
         {
             List<GameObject> targetEnemyList = new List<GameObject>();
 
@@ -380,40 +321,37 @@ public class PlayerController : MonoBehaviour
 
                 if (enemyHealth.currentHealth <= 0) //Enemy should be in utility state
                 {
-                    targetEnemyList.Add(enemyHealth.gameObject);
-                    slicable = true;
-                    Physics.IgnoreLayerCollision(0, 8, true);
-                    StartCoroutine(Dash(0f));
+                    targetEnemyList.Add(enemyHealth.gameObject);    //Target added to list
+                    slicable = true;                                //Potential Target active
+                    Physics.IgnoreLayerCollision(0, 8, true);       //Prevent player collision                    
                 }
             }
 
             if (slicable)
             {
                 //Become temp invuln
-                if (targetEnemyList.Count > 1)
+                if (targetEnemyList.Count > 1)                      //If more than one potential target
                 {
                     GameObject targetEnemy = new GameObject();
                     float dist = 100f;
 
                     foreach(GameObject target in targetEnemyList)
                     {
-                        if(Vector3.Distance(transform.position, target.transform.position) < dist)
+                        if(Vector3.Distance(transform.position, target.transform.position) < dist) //Filter to closest enemy position
                         {
                             targetEnemy = target;
                         }
                     }
 
-                    
-                    //RotateToTarget(targetEnemy.transform);
-                    
+                    RotateToTarget(targetEnemy.transform);          //Rotate to enemy
+                    StartCoroutine(Dash(0f));                       //Activate Dashh Through
 
                     //Set off utility state explosion
                 }
                 else
                 {
-                    //Physics.IgnoreLayerCollision(0, 8, true);
-                    RotateToTarget(targetEnemyList[0].transform);
-                    StartCoroutine(Dash(0f));
+                    RotateToTarget(targetEnemyList[0].transform);   //Rotate to enemy
+                    StartCoroutine(Dash(0f));                       //Activate Dash Through
 
                     //Set off utility state explosion
                 }
@@ -423,21 +361,20 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(resetTime);
         Physics.IgnoreLayerCollision(0, 8, false);
         isBusy = false;
-
     }
 
      
 
 
-    IEnumerator KnockbackTarget(GameObject target)
+    IEnumerator KnockbackTarget(GameObject target) //Knockback ability
     {
         isBusy = true;
 
         float startTime = Time.time;
 
-        Vector3 knockbackDirection = (target.transform.position - transform.position).normalized;
+        Vector3 knockbackDirection = (target.transform.position - transform.position).normalized; //Knockback away from player position
 
-        while (Time.time < startTime + dashTime)
+        while (Time.time < startTime + dashTime) //Knock back for duration
         {
             target.GetComponent<CharacterController>().Move(knockbackDirection * dashSpeed * Time.deltaTime);
 
