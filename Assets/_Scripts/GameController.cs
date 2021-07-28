@@ -32,7 +32,7 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
-        //UpdateToFollow(isPlayerDashing);
+        UpdateToFollow(isPlayerDashing);
         
         //Player.GetComponent<PlayerController>().focus = //Utility State enemies in list
     }
