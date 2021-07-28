@@ -1477,17 +1477,20 @@ MonoBehaviour:
   moveSpeedModifier: 0
   cameraDistance: 0
   isBusy: 0
-  focus: 123
+  focus: 0
+  focusValue: 0
   dashTime: 0.3
   dashSpeed: 20
   dashResetTime: 1
-  attackRange: 2
+  attackRange: 4
   attackArc: 150
   attackResetTime: 0.3
   targetList: []
   attackDamage: 10
   attackDamageMultiplier: 0
   maxComboDelay: 0.5
+  slashRange: 5
+  slashArc: 50
   isHolding: 0
   isSpamming: 0
   holdDetect: 0.8
@@ -1507,6 +1510,7 @@ MonoBehaviour:
   currentHealth: 0
   healthBarCanvas: {fileID: 0}
   healthSlider: {fileID: 931977206}
+  invulnerable: 0
   safeDistance: 1.5
 --- !u!82 &1702546732
 AudioSource:

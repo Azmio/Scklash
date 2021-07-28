@@ -372,7 +372,7 @@ public class EnemyAI : MonoBehaviour
         enemyMovement.agent.enabled = false;
         enemyMovement.enabled = false;
         enemyCombat.enabled = false;
-        enemyHealthSystem.currentHealth = 100;
+        //enemyHealthSystem.currentHealth = 100;
         EnemySpawner.instance.enemiesInTheScene.Remove(this);
         EnemySpawner.instance.UtilityStatesInTheScene.Add(this);
         currentAction = State.Utility;

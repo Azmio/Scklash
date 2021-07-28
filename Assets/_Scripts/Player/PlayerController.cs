@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     [Header("Player Movement")]
     public float rotationSpeed = 10f;
     public float moveSpeed = 5f;
-    [Range(0, 7.5f)] public float moveSpeedModifier = 0f;
+    [Range(1, 1.7f)] public float moveSpeedModifier = 1f;
     public float cameraDistance = 15f;
     private Vector3 targetVector;
     private float hitDistance = 100f;
@@ -33,7 +33,8 @@ public class PlayerController : MonoBehaviour
 
     //Focus bar
     [Header("Current Focus")]
-    public int focus;
+    [Range(0, 100)] public int focus;
+    public int focusValue = 5;
 
     //Dash
     [Header("Dash Values")]
@@ -86,6 +87,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        GameController.instance.focusSlider.value = focus;
         float timeHeld;
 
         if (isHolding)
@@ -161,11 +163,14 @@ public class PlayerController : MonoBehaviour
 
     private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
     {
- 
-        float speed = (moveSpeed + moveSpeedModifier) * Time.deltaTime;
+        float cFocus = (float)focus;
+        moveSpeedModifier = Mathf.Lerp(1f, 1.7f, cFocus/100);
+
+        Debug.Log(moveSpeedModifier);
+        float speed = moveSpeed * moveSpeedModifier;
         target = Quaternion.Euler(0f, mCamera.transform.eulerAngles.y, 0f) * target;
 
-        pController.Move(target.normalized * speed);   
+        pController.Move(target.normalized * speed * Time.deltaTime);   
 
         if (target != Vector3.zero && !isBusy) //If input ongoing, update player rotation
         {
@@ -267,11 +272,11 @@ public class PlayerController : MonoBehaviour
 
             foreach (GameObject target in targetList)
             {
-                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>(); //Acquire enemy health information
+                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>(); //Acquire enemy health information                
                 //Vector3 targetFacing = (enemyHealth.transform.forward - transform.position).normalized; //Check target facing
 
                 if (enemyHealth.GetHealth() > 0 && comboCounter == 4) //Combo modifier added
-                {
+                {                    
                     attackDamageMultiplier *= 2;
                     Debug.Log("Combo Attack Complete");
                     yield return KnockbackTarget(enemyHealth.gameObject);
@@ -285,8 +290,9 @@ public class PlayerController : MonoBehaviour
                     Debug.Log("Sneak Attack Multiplier Added");
                 }
 
-                enemyHealth.Damage(attackDamage * attackDamageMultiplier); //Apply Final Damage
-
+                if (!enemyHealth.Damage(attackDamage * attackDamageMultiplier)) //Apply Final Damage
+                    focus += 5;                                                 //returns true if target is now dead
+                                
                 //Debug.Log("Attacked: " + target.name + " / Current Health: " + enemyHealth.GetHealth() + " / Target facing: " + targetFacing + " / Damage Done: " + attackDamage * attackDamageMultiplier);
             }
         }
@@ -329,7 +335,7 @@ public class PlayerController : MonoBehaviour
 
             if (slicable)
             {
-                //Become temp invuln
+                transform.GetComponent<HealthScript>().invulnerable = true; //Become Invulnerable
                 if (targetEnemyList.Count > 1)                      //If more than one potential target
                 {
                     GameObject targetEnemy = new GameObject();
@@ -345,21 +351,24 @@ public class PlayerController : MonoBehaviour
 
                     RotateToTarget(targetEnemy.transform);          //Rotate to enemy
                     StartCoroutine(Dash(0f));                       //Activate Dashh Through
-
+                    Debug.Log("Boop1");
                     //Set off utility state explosion
+                    focus += 5;
                 }
                 else
                 {
                     RotateToTarget(targetEnemyList[0].transform);   //Rotate to enemy
                     StartCoroutine(Dash(0f));                       //Activate Dash Through
-
+                    Debug.Log("Boop2");
                     //Set off utility state explosion
+                    focus += 5;
                 }
             }
         }
 
         yield return new WaitForSeconds(resetTime);
         Physics.IgnoreLayerCollision(0, 8, false);
+        transform.GetComponent<HealthScript>().invulnerable = false;
         isBusy = false;
     }
 

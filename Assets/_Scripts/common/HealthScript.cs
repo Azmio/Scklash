@@ -41,13 +41,18 @@ public class HealthScript : MonoBehaviour
         return currentHealth;
     }
 
-    public void Damage(int amount) //Damage this Object
+    public bool Damage(int amount) //Damage this Object
     {
         if(!invulnerable) //Check if able to damage
         {
             currentHealth -= amount;
             healthSlider.value = currentHealth;
-        }       
+        }
+
+        if (currentHealth > 0)
+            return false;
+        else
+            return true;
 
        // if (currentHealth <= 0) //If health depleted, destroy this object
        //   Destroy(gameObject);
