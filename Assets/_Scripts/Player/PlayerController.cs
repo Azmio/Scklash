@@ -372,9 +372,6 @@ public class PlayerController : MonoBehaviour
         isBusy = false;
     }
 
-     
-
-
     IEnumerator KnockbackTarget(GameObject target) //Knockback ability
     {
         isBusy = true;
@@ -392,6 +389,39 @@ public class PlayerController : MonoBehaviour
 
         yield return null;
 
+        isBusy = false;
+    }
+
+    IEnumerator Bloom(float resetTime)
+    {
+        isBusy = true;
+
+        bool bloomable = false;
+
+        RotateToClickLocation();
+
+        if (detectAttackable(slashRange, slashArc)) //Detect Potential Slash Targets
+        {
+            List<GameObject> targetEnemyList = new List<GameObject>();
+
+            foreach (GameObject target in targetList)
+            {
+                HealthScript enemyHealth = (HealthScript)target.GetComponent<HealthScript>();
+
+                if (enemyHealth.currentHealth <= 0) //Enemy should be in utility state
+                {
+                    targetEnemyList.Add(enemyHealth.gameObject);    //Target added to list
+                    bloomable = true;                    
+                }
+            }        
+            
+            if(bloomable)
+            {
+
+            }
+        }
+
+        yield return new WaitForSeconds(resetTime);
         isBusy = false;
     }
 }
