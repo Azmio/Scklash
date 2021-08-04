@@ -17,3 +17,5 @@ MonoBehaviour:
     keyCode: 323
   - action: 1
     keyCode: 32
+  - action: 2
+    keyCode: 324

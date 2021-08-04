@@ -87,5 +87,6 @@ public class InputHandler : MonoBehaviour
 public enum PlayerActions //Player Abilities to key bind
 {    
     Attack,
-    Slash
+    Slash,
+    Bloom
 }
