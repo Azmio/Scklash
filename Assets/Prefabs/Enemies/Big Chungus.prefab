@@ -220,7 +220,7 @@ Transform:
   m_GameObject: {fileID: 3535754320255140036}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 3535754320127829142}
   - {fileID: 3535754320666297373}
@@ -261,6 +261,7 @@ MonoBehaviour:
   currentHealth: 0
   healthBarCanvas: {fileID: 0}
   healthSlider: {fileID: 3535754319712268401}
+  invulnerable: 0
   safeDistance: 0
 --- !u!195 &6028449098269015802
 NavMeshAgent:
@@ -319,11 +320,8 @@ MonoBehaviour:
   eController: {fileID: 0}
   agent: {fileID: 0}
   targetOffset: 0
-  flyHeight: 2
-  floatOffset: 0.5
   enemyTarget: {fileID: 0}
   targetPosition: {x: 0, y: 0, z: 0}
-  isFlying: 0
   isChangingPosition: 0
 --- !u!114 &4648684741968249587
 MonoBehaviour:
@@ -342,8 +340,6 @@ MonoBehaviour:
   timeUntilHit: 0.5
   timeUntilAbsorption: 5
   timeRequiredToAbsorb: 5
-  explosionCount: 3
-  currentCount: 0
   explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
   projectilePrefab: {fileID: 0}
   damageZonePrefab: {fileID: 147451902755320285, guid: 233f08ed951b8ac408c17ba2f32ca8b0, type: 3}

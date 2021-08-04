@@ -6,7 +6,7 @@ public class EnemyAI : MonoBehaviour
 {
     public enum State { Chasing, MeleeAttack, RangedAttack, Utility, Idle, StealingUtility, ChangingPosition, Roaming };
 
-    public enum Type { Ranged, Melee, FlyBoy, Utility, BigChungus };
+    public enum Type { Ranged, Melee, FlyBoy, Utility, BigChungus, UtilityThief };
 
     public Type enemyType;
 
@@ -45,6 +45,7 @@ public class EnemyAI : MonoBehaviour
         ManageHealthSystem();
         AIStateController();
     }
+
     void InitializeIfEnemy()
     {
         enemyHealthSystem.healthBarCanvas = this.transform.Find("Canvas").gameObject;
@@ -52,7 +53,6 @@ public class EnemyAI : MonoBehaviour
     }
 
     //Function that manages the AI states
-
     void AIStateController()
     {
         switch (enemyType)
@@ -66,12 +66,17 @@ public class EnemyAI : MonoBehaviour
             case Type.Ranged:
                 RangedActions();
                 break;
-            case Type.FlyBoy:
-                FlyBoyActions();
-                break;
             case Type.BigChungus:
                 BigChungusActions();
                 break;
+            case Type.UtilityThief:
+                UtilityThiefActions();
+                break;
+                /*
+            case Type.FlyBoy:
+                FlyBoyActions();
+                break;
+                */
         }
         return;
     }
@@ -84,7 +89,7 @@ public class EnemyAI : MonoBehaviour
 
         if (enemyHealthSystem.currentHealth <= 0 && enemyType != Type.Utility)
         {
-            if (enemyType == Type.FlyBoy)
+            if (enemyType == Type.UtilityThief)
             {
                 if (enemyCombat.utilitiesAbsorbed <= 0)
                 {
@@ -145,7 +150,10 @@ public class EnemyAI : MonoBehaviour
             {
                 currentAction = State.RangedAttack;
                 enemyMovement.agent.velocity = Vector3.zero;
-                enemyCombat.ShootProjectile();
+
+                if(!enemyCombat.isAttacking)
+                    StartCoroutine(enemyCombat.ShootProjectile());
+               
                 enemyMovement.isChangingPosition = true;
 
             }
@@ -158,95 +166,43 @@ public class EnemyAI : MonoBehaviour
             enemyMovement.UpdateDirection(GameController.instance.toFollow);
         }
     }
-    void FlyBoyActions()
+   
+    void UtilityThiefActions()
     {
-        //ranged enemy behaviour when there are no utility states
         if (EnemySpawner.instance.UtilityStatesInTheScene.Count == 0)
         {
-            enemyMovement.enemyTarget = GameController.instance.Player.gameObject;
-            distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
+            return;
+        }
+        if (enemyMovement.enemyTarget == null)
+        {
+            enemyMovement.GetUtilityTarget();
+           // enemyCombat.doneAttacking = false;
+        }
+        else
+        {
 
-            //reset time required to hit
-            if (distance <= attackRange * 7)
+            distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.enemyTarget.transform.position);
+
+            if (distance <= attackRange)
             {
-                enemyMovement.UpdateDirection(GameController.instance.toFollow);
+                currentAction = State.StealingUtility;
+                enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
 
-                //If enemy is changing position and done attacking
-                if (enemyMovement.isChangingPosition && enemyCombat.doneAttacking)
+                if (!enemyCombat.isAttacking)
                 {
-                    //In order to grab new target according to the new offset  
-                    currentAction = State.ChangingPosition;
-                    enemyCombat.timeUntilHit = enemyCombat.strikeDelay;
-                    enemyMovement.FlyToTarget(attackRange * 7);
-                    //check if player is at target place                 
-                    if (enemyMovement.IsAtTarget(enemyMovement.targetPosition))
-                    {
-                        enemyMovement.isChangingPosition = false;
-                        enemyCombat.doneAttacking = false;
-                        //Stop moving, and commence attack
-                        enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
-                        return;
-                    }
+                    StartCoroutine(enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>(), attackRange));
+                    //enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>());
+                }
 
-                }
-                else if (!enemyCombat.doneAttacking)
-                {
-                    currentAction = State.RangedAttack;
-                    enemyCombat.ShootProjectile();
-                    enemyMovement.GetRandomAngle(enemyMovement.targetOffset);
-                    enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
-                    enemyMovement.isChangingPosition = true;
-                }
             }
             else
             {
                 currentAction = State.Chasing;
-                // enemyCombat.currentCount = 0;
-                enemyMovement.FlyToTarget(attackRange * 7);
-                enemyMovement.UpdateDirection(GameController.instance.toFollow);
-            }
-
-        }//if there are utility states
-        else if (EnemySpawner.instance.UtilityStatesInTheScene.Count > 0)
-        {
-            if (enemyMovement.enemyTarget == GameController.instance.Player.gameObject)
-            {
-                enemyMovement.enemyTarget = null;
-            }
-            if (enemyMovement.enemyTarget == null)
-            {
-                enemyMovement.GetUtilityTarget();
-                enemyCombat.doneAttacking = false;
-            }
-            else
-            {
-
-                distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.enemyTarget.transform.position);
-
-                if (distance <= attackRange)
-                {
-                    currentAction = State.StealingUtility;
-                    Debug.Log("stealing life");
-                    enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
-                    enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
-
-                    if (!enemyCombat.doneAttacking)
-                    {
-                        enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>());
-                    }
-
-                }
-                else
-                {
-                    //fly to the utility
-                    currentAction = State.Chasing;
-                    enemyMovement.FlyToTarget(attackRange);
-                }
-
+                enemyMovement.MoveToTarget(enemyMovement.enemyTarget.transform.position, attackRange);
+                enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
             }
 
         }
-        return;
     }
     void UtilityActions()
     {
@@ -270,7 +226,8 @@ public class EnemyAI : MonoBehaviour
                     enemyCombat.doneAttacking = true;
                     enemyCombat.isBusy = true;
                     enemyMovement.agent.destination = this.gameObject.transform.position;
-                    StartCoroutine(enemyCombat.LeapAtTarget(enemyMovement.eController, 20f, 0.2f, GameController.instance.Player));                
+                    //enemyCombat.leapCoroutine=StartCoroutine(enemyCombat.LeapAtTarget(enemyMovement.eController, 20f, 0.2f, GameController.instance.Player));                
+                    StartCoroutine(enemyCombat.LeapAtTarget(enemyMovement.eController, 20f, 0.2f, GameController.instance.Player));
                 }
             }
 
@@ -283,24 +240,8 @@ public class EnemyAI : MonoBehaviour
             enemyMovement.UpdateDirection(GameController.instance.toFollow);
         }
     }
-    void MeleeActionsOld()
-    {
-        //rounding off the distance to a decimal with 2 places for more accuracy
-        distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
-        if (distance <= attackRange)
-        {
-            currentAction = State.MeleeAttack;
-            enemyMovement.UpdateDirection(GameController.instance.toFollow);
-            enemyMovement.agent.velocity = Vector3.zero;
-            enemyCombat.MeleeAttack();
-        }
-        else
-        {
-            currentAction = State.Chasing;
-            enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
-            enemyMovement.UpdateDirection(GameController.instance.toFollow);
-        }
-    }
+ 
+
 
     void BigChungusActions()
     {
@@ -311,8 +252,6 @@ public class EnemyAI : MonoBehaviour
             return;
         }
            
-        
-
         if (GameController.instance.Player.gameObject.GetComponent<HealthScript>().CheckIfVulnerable())
         {
             distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
@@ -343,7 +282,7 @@ public class EnemyAI : MonoBehaviour
             currentAction = State.Roaming;
             if (enemyMovement.targetPosition == Vector3.zero)
             {
-                enemyMovement.targetPosition =EnemyMovement.GetRandomPoint(this.gameObject.transform.position);
+                enemyMovement.GetRandomPoint(this.gameObject.transform.position);
             }
 
 
@@ -352,7 +291,7 @@ public class EnemyAI : MonoBehaviour
 
             if (distance < 1.5f)
             {
-                enemyMovement.targetPosition = EnemyMovement.GetRandomPoint(this.gameObject.transform.position);
+                enemyMovement.GetRandomPoint(this.gameObject.transform.position);
             }
             else
             {
@@ -367,9 +306,15 @@ public class EnemyAI : MonoBehaviour
 
     void ChangeToUtility()
     {
+
+        enemyMovement.eController.Move(Vector3.zero);
         enemyCombat.StopAllCoroutines();
+
+
         enemyMovement.agent.destination = this.gameObject.transform.position;
         enemyMovement.agent.enabled = false;
+
+
         enemyMovement.enabled = false;
         enemyCombat.enabled = false;
         //enemyHealthSystem.currentHealth = 100;
@@ -388,3 +333,114 @@ public class EnemyAI : MonoBehaviour
 }
 
 
+/*
+   void FlyBoyActions()
+   {
+       //ranged enemy behaviour when there are no utility states
+       if (EnemySpawner.instance.UtilityStatesInTheScene.Count == 0)
+       {
+           enemyMovement.enemyTarget = GameController.instance.Player.gameObject;
+           distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
+
+           //reset time required to hit
+           if (distance <= attackRange * 7)
+           {
+               enemyMovement.UpdateDirection(GameController.instance.toFollow);
+
+               //If enemy is changing position and done attacking
+               if (enemyMovement.isChangingPosition && enemyCombat.doneAttacking)
+               {
+                   //In order to grab new target according to the new offset  
+                   currentAction = State.ChangingPosition;
+                   enemyCombat.timeUntilHit = enemyCombat.strikeDelay;
+                   enemyMovement.FlyToTarget(attackRange * 7);
+                   //check if player is at target place                 
+                   if (enemyMovement.IsAtTarget(enemyMovement.targetPosition))
+                   {
+                       enemyMovement.isChangingPosition = false;
+                       enemyCombat.doneAttacking = false;
+                       //Stop moving, and commence attack
+                       enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
+                       return;
+                   }
+
+               }
+               else if (!enemyCombat.doneAttacking)
+               {
+                   currentAction = State.RangedAttack;
+                   enemyCombat.ShootProjectile();
+                   enemyMovement.GetRandomAngle(enemyMovement.targetOffset);
+                   enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
+                   enemyMovement.isChangingPosition = true;
+               }
+           }
+           else
+           {
+               currentAction = State.Chasing;
+               // enemyCombat.currentCount = 0;
+               enemyMovement.FlyToTarget(attackRange * 7);
+               enemyMovement.UpdateDirection(GameController.instance.toFollow);
+           }
+
+       }//if there are utility states
+       else if (EnemySpawner.instance.UtilityStatesInTheScene.Count > 0)
+       {
+           if (enemyMovement.enemyTarget == GameController.instance.Player.gameObject)
+           {
+               enemyMovement.enemyTarget = null;
+           }
+           if (enemyMovement.enemyTarget == null)
+           {
+               enemyMovement.GetUtilityTarget();
+               enemyCombat.doneAttacking = false;
+           }
+           else
+           {
+
+               distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.enemyTarget.transform.position);
+
+               if (distance <= attackRange)
+               {
+                   currentAction = State.StealingUtility;
+                   Debug.Log("stealing life");
+                   enemyMovement.HoverInPlace(enemyMovement.floatOffset / 2);
+                   enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
+
+                   if (!enemyCombat.doneAttacking)
+                   {
+                       enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>());
+                   }
+
+               }
+               else
+               {
+                   //fly to the utility
+                   currentAction = State.Chasing;
+                   enemyMovement.FlyToTarget(attackRange);
+               }
+
+           }
+
+       }
+       return;
+   }
+
+    void MeleeActionsOld()
+    {
+        //rounding off the distance to a decimal with 2 places for more accuracy
+        distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
+        if (distance <= attackRange)
+        {
+            currentAction = State.MeleeAttack;
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+            enemyMovement.agent.velocity = Vector3.zero;
+            enemyCombat.MeleeAttack();
+        }
+        else
+        {
+            currentAction = State.Chasing;
+            enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+        }
+    }
+   */
