@@ -57,9 +57,14 @@ public class PlayerController : MonoBehaviour
     private int comboCounter;
     public float maxComboDelay = 0.9f;
 
+    //Slash Attack
     [Header("Slash Attack")]
     public float slashRange = 5f;
     [Range(0, 360)] public float slashArc = 50f;
+
+    //Bloom Attack
+    [Header("Bloom Values")]
+    public float bloomReset = 0.5f;
 
     //Hold Attack
     [Header("KnockBack Values")]
@@ -134,11 +139,11 @@ public class PlayerController : MonoBehaviour
 
             if(isHolding) //Excute Knockback in arc range
             {
-                if(detectAttackable(attackRange, attackArc))
+                if(detectAttackable(attackRange, attackArc, 8))
                 {
                     foreach(GameObject enemy in targetList)
                     {
-                        StartCoroutine(KnockbackTarget(enemy));
+                        StartCoroutine(KnockbackTarget(transform.position, enemy));
                         isBusy = true;
                     }
                 }
@@ -148,6 +153,11 @@ public class PlayerController : MonoBehaviour
         if (inputHandler.GetKeyDown(PlayerActions.Slash) && !isBusy) //Slash Target - Default : RM Button
         {
             StartCoroutine(Slash(attackResetTime));
+        }
+
+        if(inputHandler.GetKeyDown(PlayerActions.Bloom) && !isBusy)
+        {
+            StartCoroutine(Bloom(bloomReset));
         }
         
         if (comboCounter >= 1 && (Time.time - lastAttackTime) > maxComboDelay) //Combo Counter timer check 
@@ -231,9 +241,9 @@ public class PlayerController : MonoBehaviour
         
     }
 
-    private bool detectAttackable(float range, float Arc) //Detect any attackable objects within arc settings
+    private bool detectAttackable(float range, float Arc, int layer) //Detect any attackable objects within arc settings
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, range, 1 << 8); //create sphere around player with radius of 3
+        Collider[] colliders = Physics.OverlapSphere(transform.position, range, 1 << layer); //create sphere around player with radius of 3
         targetList = new List<GameObject>();
 
         if (colliders.Length > 0)
@@ -265,7 +275,7 @@ public class PlayerController : MonoBehaviour
         attackDamageMultiplier = 1;
         RotateToClickLocation();
 
-        if (detectAttackable(attackRange, attackArc))
+        if (detectAttackable(attackRange, attackArc, 8))
         {
             comboCounter++;
             lastAttackTime = Time.time;
@@ -279,7 +289,7 @@ public class PlayerController : MonoBehaviour
                 {                    
                     attackDamageMultiplier *= 2;
                     Debug.Log("Combo Attack Complete");
-                    yield return KnockbackTarget(enemyHealth.gameObject);
+                    yield return KnockbackTarget(transform.position, enemyHealth.gameObject);
                     resetTime = 0.5f;
                     comboCounter = 0;
                 }
@@ -317,7 +327,7 @@ public class PlayerController : MonoBehaviour
 
         RotateToClickLocation();        
 
-        if (detectAttackable(slashRange, slashArc)) //Detect Potential Slash Targets
+        if (detectAttackable(slashRange, slashArc, 8)) //Detect Potential Slash Targets
         {
             List<GameObject> targetEnemyList = new List<GameObject>();
 
@@ -372,13 +382,13 @@ public class PlayerController : MonoBehaviour
         isBusy = false;
     }
 
-    IEnumerator KnockbackTarget(GameObject target) //Knockback ability
+    IEnumerator KnockbackTarget(Vector3 kPosition, GameObject target) //Knockback ability
     {
         isBusy = true;
 
         float startTime = Time.time;
 
-        Vector3 knockbackDirection = (target.transform.position - transform.position).normalized; //Knockback away from player position
+        Vector3 knockbackDirection = (target.transform.position - kPosition).normalized; //Knockback away from player position
 
         while (Time.time < startTime + dashTime) //Knock back for duration
         {
@@ -394,13 +404,15 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator Bloom(float resetTime)
     {
-        isBusy = true;
+        Debug.Log("bloom start");
 
+        isBusy = true;
+        
         bool bloomable = false;
 
         RotateToClickLocation();
 
-        if (detectAttackable(slashRange, slashArc)) //Detect Potential Slash Targets
+        if (detectAttackable(slashRange, slashArc, 8)) //Detect Potential Slash Targets
         {
             List<GameObject> targetEnemyList = new List<GameObject>();
 
@@ -413,15 +425,79 @@ public class PlayerController : MonoBehaviour
                     targetEnemyList.Add(enemyHealth.gameObject);    //Target added to list
                     bloomable = true;                    
                 }
-            }        
-            
-            if(bloomable)
-            {
+            }
 
+            if (bloomable)
+            {
+                if (targetEnemyList.Count > 1)                      //If more than one potential target
+                {
+                    GameObject targetEnemy = new GameObject();
+                    float dist = 100f;
+                    Debug.Log("Cough 1");
+
+                    foreach (GameObject target in targetEnemyList)
+                    {
+                        if (Vector3.Distance(transform.position, target.transform.position) < dist) //Filter to closest enemy position
+                        {
+                            targetEnemy = target;
+                            targetEnemy.tag = "UtilityState";
+                        }
+                    }
+
+                    //targetEnemy.GetComponent<EnemyAI>()
+
+                    Collider[] colliders = Physics.OverlapSphere(targetEnemy.transform.position, attackRange, 1 << 8);
+                    float startTime = Time.time;
+                    //List<GameObject> bloomTargets = new List<GameObject>();
+
+                    if (colliders.Length > 0)
+                    {
+                        foreach (Collider target in colliders)
+                        {
+                            Vector3 knockbackDirection = (target.transform.position - targetEnemy.transform.position).normalized; //Knockback away from initial Utility State Enemy position
+                            float kDist = Vector3.Distance(target.transform.position, targetEnemy.transform.position);
+
+                            if(target.tag == "Enemy")
+                            {
+                                target.GetComponent<HealthScript>().Damage(4);
+                            }
+
+                            StartCoroutine(KnockbackTarget(targetEnemyList[0].transform.position, target.gameObject));
+                        }                        
+                    }
+                    yield return new WaitForSeconds(.5f);
+                    targetEnemy.GetComponent<EnemyAI>().DestroyUtility();
+                }
+                else
+                {
+                    Debug.Log("Cough 2");
+
+                    Collider[] colliders = Physics.OverlapSphere(targetEnemyList[0].transform.position, attackRange, 1 << 8);
+                    float startTime = Time.time;
+                    
+                    if (colliders.Length > 0)
+                    {
+                        foreach (Collider target in colliders)
+                        {
+                            Vector3 knockbackDirection = (target.transform.position - targetEnemyList[0].transform.position).normalized; //Knockback away from initial Utility State Enemy position
+                            float kDist = Vector3.Distance(target.transform.position, targetEnemyList[0].transform.position);
+
+                            if (target.tag == "Enemy")
+                            {
+                                target.GetComponent<HealthScript>().Damage(4);
+                            }
+                            
+                            StartCoroutine(KnockbackTarget(targetEnemyList[0].transform.position,target.gameObject));
+                        }
+                    }
+                    yield return new WaitForSeconds(.5f);
+                    targetEnemyList[0].GetComponent<EnemyAI>().DestroyUtility();
+                }
             }
         }
 
-        yield return new WaitForSeconds(resetTime);
+        yield return new WaitForSeconds(resetTime + 5f);
+        Debug.Log("bloom end");
         isBusy = false;
     }
 }
