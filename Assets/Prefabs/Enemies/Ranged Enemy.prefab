@@ -204,6 +204,7 @@ GameObject:
   - component: {fileID: 2479958735758191994}
   - component: {fileID: 4006593382959120787}
   - component: {fileID: 4648684741968249587}
+  - component: {fileID: -8194324696951376554}
   m_Layer: 8
   m_Name: Ranged Enemy
   m_TagString: Enemy
@@ -261,6 +262,7 @@ MonoBehaviour:
   currentHealth: 0
   healthBarCanvas: {fileID: 0}
   healthSlider: {fileID: 3535754319712268401}
+  invulnerable: 0
   safeDistance: 0
 --- !u!195 &6028449098269015802
 NavMeshAgent:
@@ -318,12 +320,10 @@ MonoBehaviour:
   turnSpeed: 3
   eController: {fileID: 0}
   agent: {fileID: 0}
+  obstacle: {fileID: 0}
   targetOffset: 0
-  flyHeight: 2
-  floatOffset: 0.5
   enemyTarget: {fileID: 0}
   targetPosition: {x: 0, y: 0, z: 0}
-  isFlying: 0
   isChangingPosition: 1
 --- !u!114 &4648684741968249587
 MonoBehaviour:
@@ -342,15 +342,30 @@ MonoBehaviour:
   timeUntilHit: 0
   timeUntilAbsorption: 5
   timeRequiredToAbsorb: 5
-  explosionCount: 3
-  currentCount: 0
   explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
   projectilePrefab: {fileID: 2234940398615667336, guid: 2a9bb54c8b7bf1a4bb0c312e7426c314, type: 3}
+  damageZonePrefab: {fileID: 0}
   isAttacking: 0
   doneAttacking: 0
   utilitiesAbsorbed: 0
   knockBackSpeed: 2
   isBusy: 0
+--- !u!208 &-8194324696951376554
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3535754320255140036}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.6, y: 1, z: 0.6}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &3535754320390081013
 GameObject:
   m_ObjectHideFlags: 0

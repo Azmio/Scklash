@@ -7,14 +7,8 @@ public class EnemyCombat : MonoBehaviour
     //Damage of each attack
     public float damage = 3f;
 
-    //time delay between each hit
+    //time delay between each hit, also equal to the time required to absorb a utility state
     public float strikeDelay = 1.5f;
-
-    //time until the next hit
-    public float timeUntilHit = 0;
-
-    //time left until the utility is absorbed
-    public float timeUntilAbsorption = 5;
 
     //time required to absorb
     public float timeRequiredToAbsorb = 5f;
@@ -26,32 +20,23 @@ public class EnemyCombat : MonoBehaviour
 
     public GameObject damageZonePrefab;
 
+    //attack prefab
+    public GameObject attackPrefab;
+
     public bool isAttacking = false;
 
     //is player done attacking, used by the ranged attacks
     public bool doneAttacking = false;
 
-    public int utilitiesAbsorbed = 0;
+    public int soulValue = 1;
 
     public float knockBackSpeed = 20f;
 
     public bool isBusy = false;
 
-    public Coroutine leapCoroutine;
-    public void MeleeAttack()
+    private void OnDisable()
     {
-        if (timeUntilHit <= 0)
-        {
-            isAttacking = true;
-            GameController.instance.Player.GetComponent<HealthScript>().Damage((int)damage);
-            //StartCoroutine(KnockbackTarget(GameController.instance.Player));
-            timeUntilHit = strikeDelay;
-        }
-        else
-        {
-            isAttacking = false;
-            timeUntilHit -= Time.deltaTime;
-        }
+        Debug.Log("this is not enabled anymore " + this.enabled);
     }
 
 
@@ -68,30 +53,8 @@ public class EnemyCombat : MonoBehaviour
         
     }
 
-    //obsolete
-    /*
-    public void RangedAttack()
-    {
-        
-        if (timeUntilHit <= 0 && currentCount< explosionCount)
-        {
-            isAttacking = true;
-            Instantiate(explosionPrefab, GameController.instance.toFollow, GameController.instance.Player.transform.rotation);
-            timeUntilHit = strikeDelay;
-            currentCount++;
-        }
-        else if (currentCount < explosionCount)
-        {
-            timeUntilHit -= Time.deltaTime;
-        }
-        else
-        {
-            isAttacking = false;
-            doneAttacking = true;
-            timeUntilHit -= Time.deltaTime;
-        }
-    }
-    */
+
+
     public IEnumerator ShootProjectile()
     {
         isAttacking = true;
@@ -108,7 +71,6 @@ public class EnemyCombat : MonoBehaviour
         doneAttacking = true;
     }
 
-    
 
     public IEnumerator StealUtility(EnemyAI _target,float _range)
     {
@@ -118,6 +80,7 @@ public class EnemyCombat : MonoBehaviour
         float distanceCheck;
         while (Time.time < startTime + timeRequiredToAbsorb)
         {
+            
             distanceCheck = EnemyAI.GetPreciseDistance(_target.transform.position, this.transform.position);
             if (distanceCheck <= _range)
             {
@@ -129,7 +92,8 @@ public class EnemyCombat : MonoBehaviour
                 yield break;
             }      
         }
-        _target.DestroyUtility();
+        soulValue += _target.enemyCombat.soulValue;
+        _target.DestroyUtility();   
         isAttacking = false;
 
     }
@@ -162,6 +126,11 @@ public class EnemyCombat : MonoBehaviour
 
         while (Time.time < startTime + _leapDuration)
         {
+            if (this.enabled == false)
+            {
+                Debug.Log("Cancelling Leap");
+                yield break;
+            }
             _controller.Move(transform.forward * _leapSpeed * Time.deltaTime);
             distanceCheck = EnemyAI.GetPreciseDistance(_target.transform.position, this.transform.position);
             // Debug.Log("distance is"+distanceCheck);
@@ -231,6 +200,42 @@ IEnumerator SpawnExplosions(int _count, float _delay)
         {
             doneAttacking = false;
             timeUntilAbsorption -= Time.deltaTime;
+        }
+    }
+   public void MeleeAttack()
+    {
+        if (timeUntilHit <= 0)
+        {
+            isAttacking = true;
+            GameController.instance.Player.GetComponent<HealthScript>().Damage((int)damage);
+            //StartCoroutine(KnockbackTarget(GameController.instance.Player));
+            timeUntilHit = strikeDelay;
+        }
+        else
+        {
+            isAttacking = false;
+            timeUntilHit -= Time.deltaTime;
+        }
+    }
+    public void RangedAttack()
+    {
+        
+        if (timeUntilHit <= 0 && currentCount< explosionCount)
+        {
+            isAttacking = true;
+            Instantiate(explosionPrefab, GameController.instance.toFollow, GameController.instance.Player.transform.rotation);
+            timeUntilHit = strikeDelay;
+            currentCount++;
+        }
+        else if (currentCount < explosionCount)
+        {
+            timeUntilHit -= Time.deltaTime;
+        }
+        else
+        {
+            isAttacking = false;
+            doneAttacking = true;
+            timeUntilHit -= Time.deltaTime;
         }
     }
 ?*/
