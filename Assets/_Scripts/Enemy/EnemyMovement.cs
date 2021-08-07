@@ -13,22 +13,16 @@ public class EnemyMovement : MonoBehaviour
     
     //testing NavMesh to make the Enemies "smarter"
     public NavMeshAgent agent;
+    public NavMeshObstacle obstacle;
 
     //an offset which is nothing but a random angle that will be used to position the enemy on a random point which will be in the attack radius
     public float targetOffset;
-
-
-    public float flyHeight = 2f;
-
-    public float floatOffset = 0.5f;
 
     public GameObject enemyTarget;
 
     public Vector3 targetPosition= Vector3.zero;
 
     float minDistance = float.MaxValue;
-
-    public bool isFlying = false;
 
     public bool isChangingPosition = false;
 
@@ -37,6 +31,8 @@ public class EnemyMovement : MonoBehaviour
         //Not sure if we need the character controller anymore but ill let it be
         eController = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
+        obstacle = GetComponent<NavMeshObstacle>();
+        obstacle.enabled = false;
 
         //So that the agent won't rotate on it's own and that we could do it via our move to player function
         agent.updateRotation = false;
@@ -94,26 +90,7 @@ public class EnemyMovement : MonoBehaviour
         else
             targetOffset = _previous + (Random.Range(15, 30) * 0.0174533f * (Random.Range(0, 2) * 2 - 1));
     }
-
-    public void HoverInPlace(float _offset)
-    {
-        agent.enabled = false;
-        // make player float up and down when sitting idle
-        Vector3 temp = transform.position;
-        temp.y= flyHeight + Mathf.Sin(Time.fixedTime * Mathf.PI)*_offset;
-        transform.position = temp;
-    }
-
-    public void FlyToTarget(float attackRange)
-    {
-        UpdateDirection(enemyTarget.transform.position);
-        targetPosition = GetTarget(enemyTarget.transform.position, attackRange);
-        Vector3 targetDirection = targetPosition - this.transform.position;
-        targetDirection.y = 0;
-        HoverInPlace(floatOffset);
-        eController.Move(targetDirection.normalized * moveSpeed * Time.deltaTime);
-    }
-
+   
     public void GetUtilityTarget()
     {
         minDistance = float.MaxValue;
@@ -126,54 +103,6 @@ public class EnemyMovement : MonoBehaviour
             }
         }
     }
-    
-    public IEnumerator Fly(float _time,float _smoothingVar)
-    {
-        Debug.Log("Making the enemy fly");
-        isFlying = true;
-        float controlVar = 0;
-        float increment = _smoothingVar / _time;
-        Vector3 temp;
-        while (controlVar<=1)
-        {
-            temp = this.gameObject.transform.position;
-            temp.y = Mathf.Lerp(1, flyHeight, controlVar);
-            this.gameObject.transform.position = temp;
-
-            controlVar += increment;
-
-            yield return new WaitForSeconds(_smoothingVar);
-        }
-
-        yield return new WaitForSeconds(_time / 2);
-        //changingYPosition = false;
-    }
-
-    public IEnumerator Land(float _time, float _smoothingVar)
-    {
-        Debug.Log("Making the enemy land");
-        float startHeight = this.gameObject.transform.position.y;
-        float controlVar = 0;
-        float increment = _smoothingVar / _time;
-        isFlying = false;
-        Vector3 temp;
-        while (controlVar <= 1)
-        {
-            temp = this.gameObject.transform.position;
-
-            temp.y = Mathf.Lerp(startHeight,1.08f, controlVar);
-
-            this.gameObject.transform.position = temp;
-
-            controlVar += increment;
-
-            yield return new WaitForSeconds(_smoothingVar);
-        }
-
-        yield return new WaitForSeconds(_time / 2);
-        //changingYPosition = false;
-    }
-
 
     public bool IsAtTarget(Vector3 _target)
     {
@@ -181,16 +110,94 @@ public class EnemyMovement : MonoBehaviour
         //Debug.Log("Is at target distance " + tempDistance);
         if ( tempDistance<= 1)
             return true;
+
         return false;
     }
 
-    public static Vector3 GetRandomDirection()
+    public Vector3 GetRandomDirection()
     {
-        return new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+        Vector3 temp = (GameController.instance.toFollow - transform.position).normalized;
+        temp = Quaternion.AngleAxis(Random.Range(25, 45), Vector3.up) * temp;
+
+
+        // return new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+
+        return temp;
     }
 
-    public static Vector3 GetRandomPoint(Vector3 _currentPosition)
+    public void GetRandomPoint(Vector3 _currentPosition)
     {
-        return _currentPosition + GetRandomDirection() * Random.Range(5f, 10f);
+        targetPosition = _currentPosition + GetRandomDirection() * Random.Range(5f, 10f);
     }
 }
+
+
+/*
+ Flying enemy code
+   public void HoverInPlace(float _offset)
+   {
+       agent.enabled = false;
+       // make player float up and down when sitting idle
+       Vector3 temp = transform.position;
+       temp.y= flyHeight + Mathf.Sin(Time.fixedTime * Mathf.PI)*_offset;
+       transform.position = temp;
+   }
+
+
+   public void FlyToTarget(float attackRange)
+   {
+       UpdateDirection(enemyTarget.transform.position);
+       targetPosition = GetTarget(enemyTarget.transform.position, attackRange);
+       Vector3 targetDirection = targetPosition - this.transform.position;
+       targetDirection.y = 0;
+       HoverInPlace(floatOffset);
+       eController.Move(targetDirection.normalized * moveSpeed * Time.deltaTime);
+   }
+   public IEnumerator Fly(float _time,float _smoothingVar)
+   {
+       Debug.Log("Making the enemy fly");
+       isFlying = true;
+       float controlVar = 0;
+       float increment = _smoothingVar / _time;
+       Vector3 temp;
+       while (controlVar<=1)
+       {
+           temp = this.gameObject.transform.position;
+           temp.y = Mathf.Lerp(1, flyHeight, controlVar);
+           this.gameObject.transform.position = temp;
+
+           controlVar += increment;
+
+           yield return new WaitForSeconds(_smoothingVar);
+       }
+
+       yield return new WaitForSeconds(_time / 2);
+       //changingYPosition = false;
+   }
+
+   public IEnumerator Land(float _time, float _smoothingVar)
+   {
+       Debug.Log("Making the enemy land");
+       float startHeight = this.gameObject.transform.position.y;
+       float controlVar = 0;
+       float increment = _smoothingVar / _time;
+       isFlying = false;
+       Vector3 temp;
+       while (controlVar <= 1)
+       {
+           temp = this.gameObject.transform.position;
+
+           temp.y = Mathf.Lerp(startHeight,1.08f, controlVar);
+
+           this.gameObject.transform.position = temp;
+
+           controlVar += increment;
+
+           yield return new WaitForSeconds(_smoothingVar);
+       }
+
+       yield return new WaitForSeconds(_time / 2);
+       //changingYPosition = false;
+   }
+
+   */

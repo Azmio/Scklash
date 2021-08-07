@@ -204,6 +204,7 @@ GameObject:
   - component: {fileID: 2479958735758191994}
   - component: {fileID: 4006593382959120787}
   - component: {fileID: 4648684741968249587}
+  - component: {fileID: 3473992383687257070}
   m_Layer: 8
   m_Name: Big Chungus
   m_TagString: Enemy
@@ -220,7 +221,7 @@ Transform:
   m_GameObject: {fileID: 3535754320255140036}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 3535754320127829142}
   - {fileID: 3535754320666297373}
@@ -257,10 +258,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4875e130e8ee0d6429d4b32d6b06c74a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 500
   currentHealth: 0
   healthBarCanvas: {fileID: 0}
   healthSlider: {fileID: 3535754319712268401}
+  invulnerable: 0
   safeDistance: 0
 --- !u!195 &6028449098269015802
 NavMeshAgent:
@@ -318,12 +320,10 @@ MonoBehaviour:
   turnSpeed: 4
   eController: {fileID: 0}
   agent: {fileID: 0}
+  obstacle: {fileID: 0}
   targetOffset: 0
-  flyHeight: 2
-  floatOffset: 0.5
   enemyTarget: {fileID: 0}
   targetPosition: {x: 0, y: 0, z: 0}
-  isFlying: 0
   isChangingPosition: 0
 --- !u!114 &4648684741968249587
 MonoBehaviour:
@@ -342,16 +342,31 @@ MonoBehaviour:
   timeUntilHit: 0.5
   timeUntilAbsorption: 5
   timeRequiredToAbsorb: 5
-  explosionCount: 3
-  currentCount: 0
   explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
   projectilePrefab: {fileID: 0}
   damageZonePrefab: {fileID: 147451902755320285, guid: 233f08ed951b8ac408c17ba2f32ca8b0, type: 3}
+  attackPrefab: {fileID: 0}
   isAttacking: 0
   doneAttacking: 0
-  utilitiesAbsorbed: 0
+  soulValue: 2
   knockBackSpeed: 30
   isBusy: 0
+--- !u!208 &3473992383687257070
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3535754320255140036}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.6, y: 1, z: 0.6}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &3535754320390081013
 GameObject:
   m_ObjectHideFlags: 0

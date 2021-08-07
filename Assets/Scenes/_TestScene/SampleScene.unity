@@ -392,7 +392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rangedEnemy: {fileID: 3535754320255140036, guid: 8ec13e5c6fbb60446bc24ccc961f29a0, type: 3}
   meleeEnemy: {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
-  flyBoy: {fileID: 4652786200488287562, guid: fad1b0610b80fad4da10923d5d52256c, type: 3}
+  flyBoy: {fileID: 8570692683728487809, guid: 268ed151762e9c143b2baf2ce0563dfe, type: 3}
   bigChungus: {fileID: 3535754320255140036, guid: d1741605ac1d1934cbab2c1ee2bea540, type: 3}
   waves:
   - name: First Wave
@@ -1511,7 +1511,7 @@ MonoBehaviour:
   healthBarCanvas: {fileID: 0}
   healthSlider: {fileID: 931977206}
   invulnerable: 0
-  safeDistance: 1.5
+  safeDistance: 2.5
 --- !u!82 &1702546732
 AudioSource:
   m_ObjectHideFlags: 0
