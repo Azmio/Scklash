@@ -55,6 +55,10 @@ public class EnemyAI : MonoBehaviour
     //Function that manages the AI states
     void AIStateController()
     {
+        //The enemies won't do anything if the player is dashing as if they are stunned
+        if (GameController.isPlayerDashing)
+            return;
+
         switch (enemyType)
         {
             case Type.Utility:
@@ -81,47 +85,83 @@ public class EnemyAI : MonoBehaviour
         return;
     }
 
-
-    void ManageHealthSystem()
+    void UtilityActions()
     {
-        enemyHealthSystem.healthBarCanvas.transform.rotation = Camera.main.transform.rotation;
-        enemyHealthSystem.healthSlider.targetGraphic.color = Color.Lerp(Color.red, Color.green, enemyHealthSystem.currentHealth / 100f);
-
-        if (enemyHealthSystem.currentHealth <= 0 && enemyType != Type.Utility)
+        //I do nothing as of now
+        return;
+    }
+    void UtilityThiefActions()
+    {
+        if (EnemySpawner.instance.UtilityStatesInTheScene.Count == 0)
         {
-            if (enemyType == Type.UtilityThief)
+            return;
+        }
+        if (enemyMovement.enemyTarget == null)
+        {
+            enemyMovement.GetUtilityTarget();
+            // enemyCombat.doneAttacking = false;
+        }
+        else
+        {
+
+            distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.enemyTarget.transform.position);
+
+            if (distance <= attackRange)
             {
-                if (enemyCombat.utilitiesAbsorbed <= 0)
+                currentAction = State.StealingUtility;
+                enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
+
+                if (!enemyCombat.isAttacking)
                 {
-                    enemyType = Type.Utility;
-                    ChangeToUtility();
-                    return;
+                    StartCoroutine(enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>(), attackRange));
+                    //enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>());
                 }
-                else
-                {
-                    while (enemyCombat.utilitiesAbsorbed > 0)
-                    {
-                        EnemySpawner.instance.SpawnEnemy(EnemySpawner.instance.meleeEnemy);
-                        enemyCombat.utilitiesAbsorbed--;
-                    }
-                }
-                Destroy(this.gameObject);
+
             }
             else
             {
-                enemyType = Type.Utility;
-                ChangeToUtility();
-                return;
+                currentAction = State.Chasing;
+                enemyMovement.MoveToTarget(enemyMovement.enemyTarget.transform.position, attackRange);
+                enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
             }
+
         }
     }
-
-    public void DestroyUtility()
-    {
-        EnemySpawner.instance.UtilityStatesInTheScene.Remove(this);
-        Destroy(this.gameObject);
-    }
     void RangedActions()
+    {
+        //rounding off the distance to a decimal with 2 places for more accuracy
+        distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
+        if (distance <= attackRange)
+        {
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+            enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
+            if (enemyMovement.IsAtTarget(enemyMovement.agent.destination))
+            {
+                //Stop moving, and commence attack
+                enemyCombat.doneAttacking = false;
+                enemyMovement.GetRandomAngle(enemyMovement.targetOffset);
+
+            }
+            if (!enemyCombat.doneAttacking)
+            {
+                currentAction = State.RangedAttack;
+                enemyMovement.agent.velocity = Vector3.zero;
+
+                if (!enemyCombat.isAttacking)
+                    StartCoroutine(enemyCombat.ShootProjectile());
+                
+            }
+
+        }
+        else
+        {
+            currentAction = State.Chasing;
+            // enemyCombat.currentCount = 0;
+            enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
+            enemyMovement.UpdateDirection(GameController.instance.toFollow);
+        }
+    }
+    void RangedActionsOld()
     {
         //rounding off the distance to a decimal with 2 places for more accuracy
         distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
@@ -151,9 +191,9 @@ public class EnemyAI : MonoBehaviour
                 currentAction = State.RangedAttack;
                 enemyMovement.agent.velocity = Vector3.zero;
 
-                if(!enemyCombat.isAttacking)
+                if (!enemyCombat.isAttacking)
                     StartCoroutine(enemyCombat.ShootProjectile());
-               
+
                 enemyMovement.isChangingPosition = true;
 
             }
@@ -166,50 +206,6 @@ public class EnemyAI : MonoBehaviour
             enemyMovement.UpdateDirection(GameController.instance.toFollow);
         }
     }
-   
-    void UtilityThiefActions()
-    {
-        if (EnemySpawner.instance.UtilityStatesInTheScene.Count == 0)
-        {
-            return;
-        }
-        if (enemyMovement.enemyTarget == null)
-        {
-            enemyMovement.GetUtilityTarget();
-           // enemyCombat.doneAttacking = false;
-        }
-        else
-        {
-
-            distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.enemyTarget.transform.position);
-
-            if (distance <= attackRange)
-            {
-                currentAction = State.StealingUtility;
-                enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
-
-                if (!enemyCombat.isAttacking)
-                {
-                    StartCoroutine(enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>(), attackRange));
-                    //enemyCombat.StealUtility(enemyMovement.enemyTarget.GetComponent<EnemyAI>());
-                }
-
-            }
-            else
-            {
-                currentAction = State.Chasing;
-                enemyMovement.MoveToTarget(enemyMovement.enemyTarget.transform.position, attackRange);
-                enemyMovement.UpdateDirection(enemyMovement.enemyTarget.transform.position);
-            }
-
-        }
-    }
-    void UtilityActions()
-    {
-        //I do nothing as of now
-        return;
-    }
-
     void MeleeActions()
     {
         distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
@@ -226,8 +222,8 @@ public class EnemyAI : MonoBehaviour
                     enemyCombat.doneAttacking = true;
                     enemyCombat.isBusy = true;
                     enemyMovement.agent.destination = this.gameObject.transform.position;
-                    //enemyCombat.leapCoroutine=StartCoroutine(enemyCombat.LeapAtTarget(enemyMovement.eController, 20f, 0.2f, GameController.instance.Player));                
-                    StartCoroutine(enemyCombat.LeapAtTarget(enemyMovement.eController, 20f, 0.2f, GameController.instance.Player));
+                    StartCoroutine(enemyCombat.LeapAtTarget(enemyMovement.eController, 20f, 0.2f, GameController.instance.Player));                
+                    
                 }
             }
 
@@ -255,6 +251,7 @@ public class EnemyAI : MonoBehaviour
         if (GameController.instance.Player.gameObject.GetComponent<HealthScript>().CheckIfVulnerable())
         {
             distance = GetPreciseDistance(this.gameObject.transform.position, GameController.instance.toFollow);
+            enemyMovement.targetPosition = Vector3.zero;
             if (distance <= attackRange && !enemyCombat.isBusy)
             {
                 currentAction = State.MeleeAttack;
@@ -287,8 +284,6 @@ public class EnemyAI : MonoBehaviour
 
 
             distance = GetPreciseDistance(this.gameObject.transform.position, enemyMovement.targetPosition);
-
-
             if (distance < 1.5f)
             {
                 enemyMovement.GetRandomPoint(this.gameObject.transform.position);
@@ -309,21 +304,65 @@ public class EnemyAI : MonoBehaviour
 
         enemyMovement.eController.Move(Vector3.zero);
         enemyCombat.StopAllCoroutines();
-
+        enemyCombat.enabled = false;
 
         enemyMovement.agent.destination = this.gameObject.transform.position;
         enemyMovement.agent.enabled = false;
-
+        enemyMovement.obstacle.enabled = true;
 
         enemyMovement.enabled = false;
-        enemyCombat.enabled = false;
+        
         //enemyHealthSystem.currentHealth = 100;
         EnemySpawner.instance.enemiesInTheScene.Remove(this);
         EnemySpawner.instance.UtilityStatesInTheScene.Add(this);
+
         currentAction = State.Utility;
         enemyHealthSystem.healthBarCanvas.SetActive(false);
         //Debug.Log(EnemySpawner.enemySpawner.UtilityStatesInTheScene[0]);
     }
+    public void DestroyUtility()
+    {
+        EnemySpawner.instance.UtilityStatesInTheScene.Remove(this);
+        Destroy(this.gameObject);
+    }
+
+    void ManageHealthSystem()
+    {
+        enemyHealthSystem.healthBarCanvas.transform.rotation = Camera.main.transform.rotation;
+        enemyHealthSystem.healthSlider.targetGraphic.color = Color.Lerp(Color.red, Color.green, enemyHealthSystem.currentHealth / 100f);
+
+        if (enemyHealthSystem.currentHealth <= 0 && enemyType != Type.Utility)
+        {
+            if (enemyType == Type.UtilityThief)
+            {
+                if (enemyCombat.soulValue ==0)
+                {
+                    enemyType = Type.Utility;
+                    ChangeToUtility();
+                    return;
+                }
+                else
+                {
+                    int spawnNumber = enemyCombat.soulValue;
+                    while (spawnNumber > 0)
+                    {
+                        EnemySpawner.instance.SpawnEnemy(EnemySpawner.instance.meleeEnemy);
+                        spawnNumber--;
+                    }
+                    Destroy(this.gameObject);
+                }
+                
+            }
+            else
+            {
+                enemyType = Type.Utility;
+                ChangeToUtility();
+                return;
+            }
+        }
+    }
+
+
     public static float GetPreciseDistance(Vector3 _a, Vector3 _b)
     {
         _a.y = 0;
