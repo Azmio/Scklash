@@ -13,6 +13,7 @@ public class EnemyMovement : MonoBehaviour
     
     //testing NavMesh to make the Enemies "smarter"
     public NavMeshAgent agent;
+    public NavMeshObstacle obstacle;
 
     //an offset which is nothing but a random angle that will be used to position the enemy on a random point which will be in the attack radius
     public float targetOffset;
@@ -30,6 +31,8 @@ public class EnemyMovement : MonoBehaviour
         //Not sure if we need the character controller anymore but ill let it be
         eController = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
+        obstacle = GetComponent<NavMeshObstacle>();
+        obstacle.enabled = false;
 
         //So that the agent won't rotate on it's own and that we could do it via our move to player function
         agent.updateRotation = false;
