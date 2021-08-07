@@ -301,6 +301,8 @@ public class EnemyAI : MonoBehaviour
 
     void ChangeToUtility()
     {
+
+        enemyMovement.eController.Move(Vector3.zero);
         enemyCombat.StopAllCoroutines();
         enemyCombat.enabled = false;
 

@@ -70,6 +70,12 @@ public class EnemyCombat : MonoBehaviour
         isAttacking = false;
         doneAttacking = true;
     }
+    */
+    public IEnumerator ShootProjectile()
+    {
+        isAttacking = true;
+        
+        yield return new WaitForSeconds(strikeDelay);
 
     
 
