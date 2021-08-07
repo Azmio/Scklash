@@ -392,7 +392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rangedEnemy: {fileID: 3535754320255140036, guid: 8ec13e5c6fbb60446bc24ccc961f29a0, type: 3}
   meleeEnemy: {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
-  flyBoy: {fileID: 8570692683728487809, guid: 268ed151762e9c143b2baf2ce0563dfe, type: 3}
+  flyBoy: {fileID: 2359666415028603131, guid: 3220c2bfcfab47646a0ab70e2c0a6c78, type: 3}
   bigChungus: {fileID: 3535754320255140036, guid: d1741605ac1d1934cbab2c1ee2bea540, type: 3}
   waves:
   - name: First Wave
@@ -1491,6 +1491,7 @@ MonoBehaviour:
   maxComboDelay: 0.5
   slashRange: 5
   slashArc: 50
+  bloomReset: 0.5
   isHolding: 0
   isSpamming: 0
   holdDetect: 0.8

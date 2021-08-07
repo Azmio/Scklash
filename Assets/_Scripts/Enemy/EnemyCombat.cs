@@ -70,14 +70,7 @@ public class EnemyCombat : MonoBehaviour
         isAttacking = false;
         doneAttacking = true;
     }
-    */
-    public IEnumerator ShootProjectile()
-    {
-        isAttacking = true;
-        
-        yield return new WaitForSeconds(strikeDelay);
 
-    
 
     public IEnumerator StealUtility(EnemyAI _target,float _range)
     {
