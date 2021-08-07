@@ -176,7 +176,7 @@ public class PlayerController : MonoBehaviour
         float cFocus = (float)focus;
         moveSpeedModifier = Mathf.Lerp(1f, 1.7f, cFocus/100);
 
-        Debug.Log(moveSpeedModifier);
+        //Debug.Log(moveSpeedModifier);
         float speed = moveSpeed * moveSpeedModifier;
         target = Quaternion.Euler(0f, mCamera.transform.eulerAngles.y, 0f) * target;
 
