@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< refs/remotes/origin/main
 guid: 0d61afd8be2fd8c4991ea76521da6e99
+=======
+guid: 5ba0f15536f24a145b812fe2e7dd6362
+>>>>>>> Rig and soul, not sure why it's on my git kraken
 ModelImporter:
   serializedVersion: 21100
   internalIDToNameTable:

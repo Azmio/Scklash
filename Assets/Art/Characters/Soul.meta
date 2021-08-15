@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< refs/remotes/origin/main
 guid: 03e6ac69f5c4afd4aba921aae49a80cb
+=======
+guid: 3e9c31afc833ac4428196766643008b9
+>>>>>>> Rig and soul, not sure why it's on my git kraken
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< refs/remotes/origin/main
 guid: 079637bbfeb62ad46910152fa3f1f97e
+=======
+guid: c49f18df2978e6e49beb0ff666b03dc5
+>>>>>>> Rig and soul, not sure why it's on my git kraken
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
