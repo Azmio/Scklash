@@ -203,7 +203,7 @@ GameObject:
   - component: {fileID: 6028449098269015802}
   - component: {fileID: 2479958735758191994}
   - component: {fileID: 4006593382959120787}
-  - component: {fileID: 4648684741968249587}
+  - component: {fileID: 6909860984301511095}
   - component: {fileID: 3473992383687257070}
   m_Layer: 8
   m_Name: Big Chungus
@@ -273,7 +273,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3535754320255140036}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.8
+  m_Radius: 1.35
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 20
@@ -325,7 +325,7 @@ MonoBehaviour:
   enemyTarget: {fileID: 0}
   targetPosition: {x: 0, y: 0, z: 0}
   isChangingPosition: 0
---- !u!114 &4648684741968249587
+--- !u!114 &6909860984301511095
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -334,21 +334,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 3535754320255140036}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7809c60ff1a69742bd9100aacc44bd7, type: 3}
+  m_Script: {fileID: 11500000, guid: adbfc51088c14b64aab16dabb9b3e76b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 3
   strikeDelay: 2
   timeRequiredToAbsorb: 5
-  explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
-  projectilePrefab: {fileID: 0}
-  damageZonePrefab: {fileID: 147451902755320285, guid: 233f08ed951b8ac408c17ba2f32ca8b0, type: 3}
-  attackPrefab: {fileID: 0}
   isAttacking: 0
   doneAttacking: 0
   soulValue: 2
-  knockBackSpeed: 30
   isBusy: 0
+  attackPrefab: {fileID: 147451902755320285, guid: 233f08ed951b8ac408c17ba2f32ca8b0, type: 3}
 --- !u!208 &3473992383687257070
 NavMeshObstacle:
   m_ObjectHideFlags: 0

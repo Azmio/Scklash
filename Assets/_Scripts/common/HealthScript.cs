@@ -92,9 +92,17 @@ public class HealthScript : MonoBehaviour
                 }
             }
             if (minDistance <= safeDistance)
+            {
+                //enable obstacle
                 return false;
+            }
+                
             else
+            {
+                //disable obstacle
                 return true;
+            }
+                
 
         }
     }

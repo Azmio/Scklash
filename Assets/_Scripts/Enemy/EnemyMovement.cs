@@ -13,6 +13,7 @@ public class EnemyMovement : MonoBehaviour
     
     //testing NavMesh to make the Enemies "smarter"
     public NavMeshAgent agent;
+    public float agentRadius;
     public NavMeshObstacle obstacle;
 
     //an offset which is nothing but a random angle that will be used to position the enemy on a random point which will be in the attack radius
@@ -33,6 +34,7 @@ public class EnemyMovement : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         obstacle = GetComponent<NavMeshObstacle>();
         obstacle.enabled = false;
+        agentRadius = agent.radius;
 
         //So that the agent won't rotate on it's own and that we could do it via our move to player function
         agent.updateRotation = false;
@@ -127,7 +129,14 @@ public class EnemyMovement : MonoBehaviour
 
     public void GetRandomPoint(Vector3 _currentPosition)
     {
-        targetPosition = _currentPosition + GetRandomDirection() * Random.Range(5f, 10f);
+        targetPosition = _currentPosition + GetRandomDirection() * Random.Range(10f, 15f);
+        Vector3 temp = targetPosition;
+        if(NavMesh.SamplePosition(targetPosition, out NavMeshHit hit, 15f, NavMesh.AllAreas))
+        {
+            Debug.Log("Changed the dood's location to a point on the nav mesh");
+            targetPosition = hit.position;
+
+        }
     }
 }
 
