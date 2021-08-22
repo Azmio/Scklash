@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 4758025844393670341}
   - component: {fileID: 3730151044962919749}
   - component: {fileID: 2753100958150609324}
-  - component: {fileID: 5849560105861024460}
+  - component: {fileID: 7588348923682066624}
   - component: {fileID: 3318675893428570282}
   m_Layer: 8
   m_Name: Utility Thief
@@ -278,6 +278,7 @@ MonoBehaviour:
   enemyCombat: {fileID: 0}
   enemyHealthSystem: {fileID: 0}
   attackRange: 2
+  isActive: 1
   currentAction: 0
 --- !u!114 &2753100958150609324
 MonoBehaviour:
@@ -300,7 +301,7 @@ MonoBehaviour:
   enemyTarget: {fileID: 0}
   targetPosition: {x: 0, y: 0, z: 0}
   isChangingPosition: 0
---- !u!114 &5849560105861024460
+--- !u!114 &7588348923682066624
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -309,21 +310,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 2359666415028603131}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7809c60ff1a69742bd9100aacc44bd7, type: 3}
+  m_Script: {fileID: 11500000, guid: 1cd13cae7b8977348857dcdfbdd0190d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 3
-  strikeDelay: 1.5
+  strikeDelay: 5
   timeRequiredToAbsorb: 5
-  explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
-  projectilePrefab: {fileID: 0}
-  damageZonePrefab: {fileID: 0}
-  attackPrefab: {fileID: 0}
   isAttacking: 0
   doneAttacking: 0
-  soulValue: 1
-  knockBackSpeed: 30
+  soulValue: 0
   isBusy: 0
+  attackPrefab: {fileID: 6614077098577363081, guid: e44f6802aca089e4dbf855d3e535ff2a, type: 3}
+  timeRequiredToSuck: 5
+  enemyTarget: {fileID: 0}
 --- !u!208 &3318675893428570282
 NavMeshObstacle:
   m_ObjectHideFlags: 0
