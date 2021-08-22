@@ -20,6 +20,8 @@ public class EnemyAI : MonoBehaviour
 
     public bool isActive=true;
 
+    public bool canBeKnocked = false;
+
     //Distance between player/target position to the enemy
     float distance;
 
@@ -44,6 +46,7 @@ public class EnemyAI : MonoBehaviour
         if (enemyType == Type.Utility)
         {
             enemyMovement.agent.enabled = false;
+            enemyMovement.obstacle.enabled = true;
             enemyMovement.enabled = false;
         }
 
@@ -201,7 +204,8 @@ public class EnemyAI : MonoBehaviour
                 if (!enemyCombat.isAttacking)
                 {
                     enemyCombat.isAttacking = true;
-                    enemyMovement.agent.destination = this.transform.position;
+                    enemyMovement.agent.enabled = false;
+                    //enemyMovement.agent.destination = this.transform.position;
                     enemyCombat.Attack();
                     enemyMovement.agent.radius = 0.01f;
                 }
@@ -212,6 +216,7 @@ public class EnemyAI : MonoBehaviour
             {
                 
                 currentAction = State.Chasing;
+                enemyMovement.agent.enabled = true;
                 enemyMovement.MoveToTarget(GameController.instance.toFollow, attackRange);
                 enemyMovement.UpdateDirection(GameController.instance.toFollow);
                 enemyMovement.agent.radius = enemyMovement.agentRadius;
@@ -221,7 +226,7 @@ public class EnemyAI : MonoBehaviour
         {
             //Get random point on screen to follow and roam
             currentAction = State.Roaming;
-            
+            enemyMovement.agent.enabled = true;
             if (enemyMovement.targetPosition == Vector3.zero)
             {
                 enemyMovement.GetRandomPoint(this.gameObject.transform.position);
