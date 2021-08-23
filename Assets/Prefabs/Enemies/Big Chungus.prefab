@@ -303,6 +303,8 @@ MonoBehaviour:
   enemyCombat: {fileID: 0}
   enemyHealthSystem: {fileID: 0}
   attackRange: 2
+  isActive: 1
+  canBeKnocked: 0
   currentAction: 0
 --- !u!114 &4006593382959120787
 MonoBehaviour:
@@ -320,6 +322,7 @@ MonoBehaviour:
   turnSpeed: 4
   eController: {fileID: 0}
   agent: {fileID: 0}
+  agentRadius: 0
   obstacle: {fileID: 0}
   targetOffset: 0
   enemyTarget: {fileID: 0}
@@ -337,7 +340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adbfc51088c14b64aab16dabb9b3e76b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 3
+  damage: 2.5
   strikeDelay: 2
   timeRequiredToAbsorb: 5
   isAttacking: 0

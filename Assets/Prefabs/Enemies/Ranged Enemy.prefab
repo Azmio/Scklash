@@ -302,7 +302,9 @@ MonoBehaviour:
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
   enemyHealthSystem: {fileID: 0}
-  attackRange: 10
+  attackRange: 8
+  isActive: 1
+  canBeKnocked: 0
   currentAction: 0
 --- !u!114 &4006593382959120787
 MonoBehaviour:
@@ -320,6 +322,7 @@ MonoBehaviour:
   turnSpeed: 3
   eController: {fileID: 0}
   agent: {fileID: 0}
+  agentRadius: 0
   obstacle: {fileID: 0}
   targetOffset: 0
   enemyTarget: {fileID: 0}
@@ -340,11 +343,11 @@ MonoBehaviour:
   damage: 3
   strikeDelay: 2.5
   timeRequiredToAbsorb: 5
-  attackPrefab: {fileID: 2234940398615667336, guid: 2a9bb54c8b7bf1a4bb0c312e7426c314, type: 3}
   isAttacking: 0
   doneAttacking: 0
   soulValue: 1
   isBusy: 0
+  attackPrefab: {fileID: 2234940398615667336, guid: 2a9bb54c8b7bf1a4bb0c312e7426c314, type: 3}
 --- !u!208 &-8194324696951376554
 NavMeshObstacle:
   m_ObjectHideFlags: 0
