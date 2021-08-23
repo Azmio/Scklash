@@ -278,8 +278,9 @@ MonoBehaviour:
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
   enemyHealthSystem: {fileID: 0}
-  attackRange: 2
+  attackRange: 5
   isActive: 1
+  canBeKnocked: 0
   currentAction: 0
 --- !u!114 &2753100958150609324
 MonoBehaviour:
