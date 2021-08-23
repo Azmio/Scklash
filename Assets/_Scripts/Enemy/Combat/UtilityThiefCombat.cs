@@ -8,7 +8,7 @@ public class UtilityThiefCombat : EnemyCombat
     public GameObject attackPrefab;
 
     public float timeRequiredToSuck;
-    
+
 
     //strike delay is going to be the reset time, that the game will wait for before re-enabling the utility thief
 
@@ -67,7 +67,7 @@ public class UtilityThiefCombat : EnemyCombat
             yield return null;
 
         //Check if it was done absorbing succesfully
-        if(temp.doneAbsorbing)
+        if (temp.doneAbsorbing)
         {
             //Increment the soul value 
             soulValue++;
@@ -79,7 +79,7 @@ public class UtilityThiefCombat : EnemyCombat
 
     public Vector3 GetWireSpawn(Vector3 targetObjectPosition)
     {
-        
+
         Vector3 temp = Vector3.zero;
         float angle = Random.Range(0, 360) * 0.0174533f;
         // using the equation of circle, getting a point on the circumference of the circle based on an offset that is a randomised value for each enemy
@@ -91,7 +91,7 @@ public class UtilityThiefCombat : EnemyCombat
         Vector3 targetPosition = temp;
         if (NavMesh.SamplePosition(temp, out NavMeshHit hit, 5f, NavMesh.AllAreas))
         {
-            
+
             targetPosition = hit.position;
 
         }

@@ -16,6 +16,25 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &3895694462137956274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4652786200488287562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcf48598abeca324888f93974eae0bcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 3
+  strikeDelay: 1.5
+  isAttacking: 0
+  doneAttacking: 0
+  soulValue: 1
+  isBusy: 0
+  attackPrefab: {fileID: 2234940398615667336, guid: 2a9bb54c8b7bf1a4bb0c312e7426c314, type: 3}
 --- !u!1001 &8179523975377706382
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -135,7 +154,8 @@ PrefabInstance:
       propertyPath: m_AgentTypeID
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2589003919024924533, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
 --- !u!1 &4652786200488287562 stripped
 GameObject:

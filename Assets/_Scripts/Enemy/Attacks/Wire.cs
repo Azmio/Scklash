@@ -12,9 +12,9 @@ public class Wire : MonoBehaviour
 
     public ParticleSystem succParticles;
 
-    public float minGrowValue=0f;
-    public float maxGrowValue=1f;
-    public float timeToGrow=1f;
+    public float minGrowValue = 0f;
+    public float maxGrowValue = 1f;
+    public float timeToGrow = 1f;
     public float refreshRate = 0.01f;
 
 
@@ -23,7 +23,7 @@ public class Wire : MonoBehaviour
 
     public Transform offset;
 
-    public float timeRequiredToAbsorb=4;
+    public float timeRequiredToAbsorb = 4;
 
     //If true then it succesfully absorbed the soul, otherwise it was used by the player or destroyed by other means
     public bool doneAbsorbing = false;
@@ -39,12 +39,12 @@ public class Wire : MonoBehaviour
         StartCoroutine(WireAndSucc());
 
     }
-   
+
     public IEnumerator WireAndSucc()
     {
         //grow the wire
         float growValue = growMaterial.GetFloat("Grow_");
-        while ( growValue< maxGrowValue)
+        while (growValue < maxGrowValue)
         {
             growValue += 1 / (timeToGrow / refreshRate);
             growMaterial.SetFloat("Grow_", growValue);
@@ -71,17 +71,18 @@ public class Wire : MonoBehaviour
         }
         Destroy(connection.gameObject);
         succParticles.Stop();
-        if(doneAbsorbing)
+
+        if (doneAbsorbing)
         {
-            
+
             target.GetComponent<EnemyAI>().DestroyUtility();
-        }    
-            
+        }
+
 
 
         //ungrow the wire :p
         yield return new WaitForSeconds(0.1f);
-        growValue= growMaterial.GetFloat("Grow_");
+        growValue = growMaterial.GetFloat("Grow_");
         while (growValue >= minGrowValue)
         {
             growValue -= 1 / (timeToGrow / refreshRate);
@@ -113,6 +114,7 @@ public class Wire : MonoBehaviour
     {
         if (connection == null)
         {
+            Debug.Log("Connection created");
             connection = Instantiate(connectionPrefab).GetComponent<Connection>();
         }
 
