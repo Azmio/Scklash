@@ -10,7 +10,8 @@ public class EnemyCombat : MonoBehaviour
     //time delay between each hit, also equal to the time required to absorb a utility state
     public float strikeDelay = 1.5f;
 
-
+    //time required to absorb
+    public float timeRequiredToAbsorb = 5f;
 
     public bool isAttacking = false;
 
