@@ -113,6 +113,7 @@ public class Wire : MonoBehaviour
     {
         if (connection == null)
         {
+            Debug.Log("Connection created");
             connection = Instantiate(connectionPrefab).GetComponent<Connection>();
         }
 
