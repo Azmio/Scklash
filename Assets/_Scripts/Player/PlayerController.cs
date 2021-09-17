@@ -2,11 +2,55 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    [Tooltip("Camera Distance not in use")]
+    [SerializeField]
+    internal InputHandler inputHandler;
 
+    [SerializeField]
+    internal PlayerHealthScript playerHealth;
+
+    [SerializeField]
+    internal PlayerMovementScript movementScript;
+
+    [SerializeField]
+    internal PlayerCombatScript combatScript;
+
+    public CharacterController charController;
+    public Camera mCamera;
+
+    
+    public Slider healthSlider;
+    public float speedMultiplier;
+
+    //public Quaternion lookRotation;
+
+    internal bool isBusy, isInvulnerable;
+    
+
+    private void Awake()
+    {
+        charController = GetComponent<CharacterController>();//Find attached component
+        mCamera = Camera.main;
+    }
+
+    private void Start()
+    {
+        isBusy = false;
+        isInvulnerable = false;
+
+        speedMultiplier = 0f;
+    }
+
+    private void Update()
+    {
+        movementScript.MovementUpdate();
+        combatScript.CombatUpdate();
+    }
+
+    /***
     private InputHandler inputHandler;
     private CharacterController pController;
     private Camera mCamera;
@@ -171,7 +215,7 @@ public class PlayerController : MonoBehaviour
         lastPosition = transform.position;
     }*/
 
-    private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
+    /***private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
     {
         float cFocus = (float)focus;
         moveSpeedModifier = Mathf.Lerp(1f, 1.7f, cFocus/100);
@@ -499,5 +543,5 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(resetTime + 5f);
         Debug.Log("bloom end");
         isBusy = false;
-    }
+    }*/
 }
