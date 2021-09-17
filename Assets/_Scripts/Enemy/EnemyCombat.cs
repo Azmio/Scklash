@@ -13,16 +13,6 @@ public class EnemyCombat : MonoBehaviour
     //time required to absorb
     public float timeRequiredToAbsorb = 5f;
 
-    //prefab of explosion object
-    public GameObject explosionPrefab;
-
-    public GameObject projectilePrefab;
-
-    public GameObject damageZonePrefab;
-
-    //attack prefab
-    public GameObject attackPrefab;
-
     public bool isAttacking = false;
 
     //is player done attacking, used by the ranged attacks
@@ -30,49 +20,26 @@ public class EnemyCombat : MonoBehaviour
 
     public int soulValue = 1;
 
-    public float knockBackSpeed = 20f;
 
     public bool isBusy = false;
 
-    private void OnDisable()
+    public virtual void Attack()
     {
-        Debug.Log("this is not enabled anymore " + this.enabled);
+        Debug.Log("I do nothing");
     }
 
 
-    public IEnumerator BigChungusAttack()
-    {
-        isBusy = true;
-        DamageZone damageZone = Instantiate(damageZonePrefab, transform.position, transform.rotation).GetComponent<DamageZone>();
-        damageZone.damage = damage;
-
-        yield return new WaitForSeconds(strikeDelay);
-
-        isBusy = false;
-        isAttacking = false;
-        
-    }
+    
+}
 
 
 
-    public IEnumerator ShootProjectile()
-    {
-        isAttacking = true;
-        
-        yield return new WaitForSeconds(strikeDelay);
-
-        //Shoot the projectile
-        GameObject temp = Instantiate(projectilePrefab, this.transform.position, this.transform.rotation);
-        temp.GetComponent<Projectile>().projectileDamage = damage;
-        Debug.Log("Kashoot!");
 
 
-        isAttacking = false;
-        doneAttacking = true;
-    }
 
-
-    public IEnumerator StealUtility(EnemyAI _target,float _range)
+//Deprecated code which was being used for the explosions
+/*
+     public IEnumerator StealUtility(EnemyAI _target,float _range)
     {
         Debug.Log("Steal Utility");
         isAttacking = true;
@@ -97,67 +64,6 @@ public class EnemyCombat : MonoBehaviour
         isAttacking = false;
 
     }
-    IEnumerator KnockbackTarget(GameObject target,Vector3 _knockbackDir)
-    {
-
-        float startTime = Time.time;
-
-        Vector3 knockbackDirection = (target.transform.position - transform.position).normalized;
-
-        while (Time.time < startTime + 0.2 )
-        {
-            
-            target.GetComponent<CharacterController>().Move(_knockbackDir * knockBackSpeed * Time.deltaTime);
-            yield return null;
-        }
-
-        yield return null;
-
-        isAttacking = false;
-    }
-
-    public IEnumerator LeapAtTarget(CharacterController _controller, float _leapSpeed, float _leapDuration, PlayerController _target)
-    {
-
-        yield return new WaitForSeconds(1.5f);
-
-        float startTime = Time.time;
-        float distanceCheck;
-
-        while (Time.time < startTime + _leapDuration)
-        {
-            if (this.enabled == false)
-            {
-                Debug.Log("Cancelling Leap");
-                yield break;
-            }
-            _controller.Move(transform.forward * _leapSpeed * Time.deltaTime);
-            distanceCheck = EnemyAI.GetPreciseDistance(_target.transform.position, this.transform.position);
-            // Debug.Log("distance is"+distanceCheck);
-
-            if (distanceCheck <= 1.4 && !isAttacking)
-            {
-                //damage the player
-                _target.GetComponent<HealthScript>().Damage((int)damage);
-                isAttacking = true;
-                StartCoroutine(KnockbackTarget(_target.gameObject, transform.forward));
-            }
-            yield return null;
-        }
-
-        doneAttacking = false;
-        isBusy = false;
-
-    }
-}
-
-
-
-
-
-
-//Deprecated code which was being used for the explosions
-/*
 IEnumerator SpawnExplosions(int _count, float _delay)
 {
     while (currentCount < _count)

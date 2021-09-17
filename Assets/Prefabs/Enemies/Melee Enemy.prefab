@@ -203,7 +203,7 @@ GameObject:
   - component: {fileID: 6028449098269015802}
   - component: {fileID: 2479958735758191994}
   - component: {fileID: 4006593382959120787}
-  - component: {fileID: 4648684741968249587}
+  - component: {fileID: 2589003919024924533}
   - component: {fileID: -4638439419918352235}
   m_Layer: 8
   m_Name: Melee Enemy
@@ -302,7 +302,9 @@ MonoBehaviour:
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
   enemyHealthSystem: {fileID: 0}
-  attackRange: 2
+  attackRange: 2.5
+  isActive: 1
+  canBeKnocked: 0
   currentAction: 0
 --- !u!114 &4006593382959120787
 MonoBehaviour:
@@ -320,12 +322,13 @@ MonoBehaviour:
   turnSpeed: 4
   eController: {fileID: 0}
   agent: {fileID: 0}
+  agentRadius: 0
   obstacle: {fileID: 0}
   targetOffset: 0
   enemyTarget: {fileID: 0}
   targetPosition: {x: 0, y: 0, z: 0}
   isChangingPosition: 0
---- !u!114 &4648684741968249587
+--- !u!114 &2589003919024924533
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -334,21 +337,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 3535754320255140036}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7809c60ff1a69742bd9100aacc44bd7, type: 3}
+  m_Script: {fileID: 11500000, guid: 2704abea0580f4b419040f7ee0c48c91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 3
   strikeDelay: 1.5
   timeRequiredToAbsorb: 5
-  explosionPrefab: {fileID: 2247008954273358159, guid: 0fe54f97493a11440a50a32e9fa42573, type: 3}
-  projectilePrefab: {fileID: 0}
-  damageZonePrefab: {fileID: 0}
-  attackPrefab: {fileID: 0}
   isAttacking: 0
   doneAttacking: 0
   soulValue: 1
-  knockBackSpeed: 30
   isBusy: 0
+  knockBackSpeed: 30
 --- !u!208 &-4638439419918352235
 NavMeshObstacle:
   m_ObjectHideFlags: 0
