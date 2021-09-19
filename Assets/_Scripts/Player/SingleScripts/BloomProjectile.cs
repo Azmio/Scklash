@@ -16,10 +16,15 @@ public class BloomProjectile : MonoBehaviour
         
     }
 
+    private void OnBecameInvisible()
+    {
+        Destroy(this.gameObject);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
 
-        if (other.tag == "Enemy")
+        if (other.CompareTag("Enemy"))//other.tag == "Enemy")
         {
             EnemyAI enemyScript = other.GetComponent<EnemyAI>();
 
@@ -43,7 +48,7 @@ public class BloomProjectile : MonoBehaviour
         }
         else
         {
-            Destroy(this.gameObject);
+            
         }
     }
 }

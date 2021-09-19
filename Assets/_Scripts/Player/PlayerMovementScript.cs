@@ -12,6 +12,7 @@ public class PlayerMovementScript : MonoBehaviour
 
     //Player movement/Rotation Values
     [Header("Player Movement Values")]
+    public float speedMultiplier = 1f;
     public float rotationSpeed = 10f;
     private float hitDistance = 100f;
 
@@ -29,7 +30,8 @@ public class PlayerMovementScript : MonoBehaviour
 
     void Start()
     {
-        
+        canMove = true;
+        speedMultiplier = 1f;
     }
 
     public void MovementUpdate()
@@ -77,7 +79,7 @@ public class PlayerMovementScript : MonoBehaviour
     {        
         //moveSpeedModifier = Mathf.Lerp(1f, 1.7f, playerController.speedMultiplier);
 
-        float speed = movementSpeed * playerController.speedMultiplier;
+        float speed = movementSpeed * speedMultiplier;
 
         target = Quaternion.Euler(0f, playerController.mCamera.transform.eulerAngles.y, 0f) * target;
 

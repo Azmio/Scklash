@@ -10,6 +10,7 @@ public class PlayerHealthScript : MonoBehaviour
     public int currentHealth = 0;
     public bool staggered = false;
 
+    public bool activeDeathTimer;
     public float deathTimerDuration = 5f;
 
     void Awake()
@@ -17,19 +18,32 @@ public class PlayerHealthScript : MonoBehaviour
 
     }
 
+    private void Start()
+    {
+        activeDeathTimer = false;
+    }
+
     public void HealthUpdate()
     {
         //currentHealth = //Utility states
-
-        if(currentHealth == 0)
-        {
-
-        }
 
         if (staggered)
             playerController.isInvulnerable = true;
         else
             playerController.isInvulnerable = false;
+
+
+        if(currentHealth == 0 && !activeDeathTimer)
+        {
+            activeDeathTimer = true;
+
+            StartCoroutine(DeathTimer());
+        }
+
+        if(activeDeathTimer && currentHealth > 0)
+        {
+            StopCoroutine(DeathTimer());
+        }
     }
 
     private void OnDestroy()
@@ -47,8 +61,7 @@ public class PlayerHealthScript : MonoBehaviour
     {
         if (!playerController.isInvulnerable) //Check if able to damage
         {
-            currentHealth -= amount;
-            playerController.healthSlider.value = currentHealth;
+            currentHealth -= amount;                        
         }
 
         if (currentHealth > 0)
@@ -56,6 +69,44 @@ public class PlayerHealthScript : MonoBehaviour
         else
             return true;
     }
+
+    IEnumerator HitEffect(float invulnDuration)
+    {
+        //player become invulnerable for x time when damaged.
+
+        while(invulnDuration > 0)
+        {
+            invulnDuration -= Time.deltaTime;
+            playerController.isInvulnerable = true;
+        }
+
+        yield return null;
+        playerController.isInvulnerable = false;
+    }
+
+    IEnumerator DeathTimer()
+    {
+        playerController.deathTimer.text = deathTimerDuration.ToString();
+        playerController.deathTimerDisplay.SetActive(true);
+
+        while(deathTimerDuration > 0)
+        {
+            deathTimerDuration -= Time.deltaTime;
+
+            playerController.deathTimer.text = GameController.instance.FormatTime(deathTimerDuration);
+            yield return null;
+        }
+
+        if(deathTimerDuration <= 0)
+        {
+            Debug.Log("You dead for reals this time");
+            yield return null;
+        }
+
+        yield return null;
+    }
+
+    
 
     /*public void Heal(int amount)
     {
@@ -74,14 +125,4 @@ public class PlayerHealthScript : MonoBehaviour
         playerController.healthSlider.value = currentHealth;
 
     }*/
-
-    void Stagger()
-    {
-
-    }
-
-    IEnumerator StartTime(float maxTime)
-    {
-        yield return null; 
-    }
 }

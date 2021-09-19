@@ -110,7 +110,11 @@ public class PlayerCombatScript : MonoBehaviour
             StartCoroutine(playerController.movementScript.Dash(0f));
         }
 
-
+        if (playerController.inputHandler.GetKeyDown(PlayerActions.Bloom) && !playerController.isBusy) //Slash Target - Default : RM Button
+        {
+            Debug.Log("woosh");
+            StartCoroutine(Bloom(0f));
+        }
 
     }
     

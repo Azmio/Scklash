@@ -21,10 +21,11 @@ public class PlayerController : MonoBehaviour
     public CharacterController charController;
     public Camera mCamera;
 
-    
-    public Slider healthSlider;
-    public float speedMultiplier;
+    public GameObject deathTimerDisplay;
+    public Text deathTimer;
 
+    public Text health;
+    public Text displaySpeedMult;
     //public Quaternion lookRotation;
 
     internal bool isBusy, isInvulnerable;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour
     {
         charController = GetComponent<CharacterController>();//Find attached component
         mCamera = Camera.main;
+        deathTimerDisplay.SetActive(false);
     }
 
     private void Start()
@@ -41,14 +43,26 @@ public class PlayerController : MonoBehaviour
         isBusy = false;
         isInvulnerable = false;
 
-        speedMultiplier = 0f;
+
     }
 
     private void Update()
     {
+        
         movementScript.MovementUpdate();
         combatScript.CombatUpdate();
+
+        health.text = playerHealth.currentHealth.ToString();
+        displaySpeedMult.text = movementScript.speedMultiplier.ToString();
     }
+
+
+
+
+
+    
+
+
 
     /***
     private InputHandler inputHandler;
