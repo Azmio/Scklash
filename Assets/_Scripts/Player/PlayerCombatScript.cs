@@ -24,8 +24,9 @@ public class PlayerCombatScript : MonoBehaviour
 
     //Attack Combo
     private float lastAttackTime;
-    private int comboIndex; //Current Combo Count
+    public int comboIndex; //Current Combo Count
     public float maxComboDelay = 0.9f;
+    public bool isAttacking;
 
     //Knockback Values
     public float KnockbackDuration = 0.3f;
@@ -44,6 +45,7 @@ public class PlayerCombatScript : MonoBehaviour
     void Start()
     {
         comboIndex = 0;
+        isAttacking = false;
     }
 
     
@@ -52,24 +54,31 @@ public class PlayerCombatScript : MonoBehaviour
         if (playerController.inputHandler.GetKeyDown(PlayerActions.Attack) && !playerController.isBusy) //If Attack Button is active
         {
             
-            Debug.Log("Button Down");
+            //Debug.Log("Button Down");
             isPressed = true;
             playerController.movementScript.canMove = false;
             playerController.movementScript.RotateToClickLocation();
         }
 
-        if (playerController.inputHandler.GetKeyUp(PlayerActions.Attack) && !playerController.isBusy) //If Attack Button is active
+        if (playerController.inputHandler.GetKeyUp(PlayerActions.Attack) && !playerController.isBusy && !isHolding) //If Attack Button is active
         {
-            Debug.Log("Button Up");
+            //Debug.Log("Button Up");
+            //isAttacking = true;
 
             if (!isHolding) //Check if holding hasn't been activated
+            {
+                playerController.anim.Play("Attack1");
                 StartCoroutine(BasicAttack(attackResetTime, comboIndex));
+            }
 
             playerController.movementScript.canMove = true;
             isPressed = false;
             isHolding = false;
             timer = 0.3f;
         }
+
+        if (playerController.inputHandler.GetKeyUp(PlayerActions.Attack) && isHolding)
+            isHolding = false;
 
         if(isPressed)
         {
@@ -85,6 +94,7 @@ public class PlayerCombatScript : MonoBehaviour
         if(isHolding)
         {
             //bool abilityComplete = false;
+            playerController.anim.Play("Attack1");
 
             if (detectAttackable(attackRange, attackArc, 8))// && !abilityComplete)
             {
@@ -94,9 +104,8 @@ public class PlayerCombatScript : MonoBehaviour
                 }
                 //abilityComplete = true;
             }
-            Debug.Log("knockback complete");
+            //Debug.Log("knockback complete");
             isPressed = false;
-            isHolding = false;
         }
 
         if (playerController.inputHandler.GetKeyDown(PlayerActions.Slash) && !playerController.isBusy) //Slash Target - Default : RM Button
@@ -115,7 +124,6 @@ public class PlayerCombatScript : MonoBehaviour
             Debug.Log("woosh");
             StartCoroutine(Bloom(0f));
         }
-
     }
     
     Vector3 TargetFacing(Vector3 targetDirection, Vector3 origin)
@@ -154,6 +162,10 @@ public class PlayerCombatScript : MonoBehaviour
         playerController.movementScript.canMove = false;
         playerController.movementScript.RotateToClickLocation();
 
+        
+
+        Debug.Log("attacking");
+
         if (detectAttackable(attackRange, attackArc, 8))
         {
             lastAttackTime = Time.time;
@@ -162,18 +174,23 @@ public class PlayerCombatScript : MonoBehaviour
             {
                 case 0: //Initial Attack
                     comboIndex++;
+                    Debug.Log("Combo 1");  
                     //animation 1
                     //sound 1
                     break;
 
                 case 1: //Second Attack
                     comboIndex++;
+                    Debug.Log("Combo 2");
+
                     //animation 2
                     //sound 2
                     break;
 
                 case 2: //Third Attack
                     comboIndex++;
+                    Debug.Log("Combo 3");
+
                     attackDamageMultiplier += 2;
                     //animation 3
                     //sound3
@@ -206,7 +223,7 @@ public class PlayerCombatScript : MonoBehaviour
             comboIndex = 0;
 
         playerController.isBusy = false;
-        playerController.movementScript.canMove = true;
+        playerController.movementScript.canMove = true;        
         yield return new WaitForSeconds(resetTime);
     }
 
@@ -302,6 +319,7 @@ public class PlayerCombatScript : MonoBehaviour
         Rigidbody projectileRigidBody = projectile.GetComponent<Rigidbody>();
         projectileRigidBody.AddForce(transform.forward * projectileForce);
 
+        //Destroy(projectile, 8);
 
         playerController.isBusy = false;
         playerController.movementScript.canMove = true;

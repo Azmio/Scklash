@@ -11,6 +11,7 @@ public class InputHandler : MonoBehaviour
 
     //Accessable player input values
     public Vector3 movementVector {get; private set;}
+    public bool isMoving;
 
     private void Awake()
     {
@@ -29,6 +30,11 @@ public class InputHandler : MonoBehaviour
         float x = Input.GetAxis("Horizontal"); 
         float z = Input.GetAxis("Vertical");
         movementVector = new Vector3(x, 0f, z); //apply movement
+
+        if (movementVector != Vector3.zero)
+            isMoving = true;
+        else
+            isMoving = false;
     }
 
     public KeyCode GetKeyCode(PlayerActions currentAction) //Check key Code

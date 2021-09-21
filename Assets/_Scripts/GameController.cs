@@ -10,7 +10,10 @@ public class GameController : MonoBehaviour
 
     public InputHandler inputHandler; //Player Controls
 
+    public EnemySpawner enemySpawner;
+
     static public bool isPlayerDashing;
+    public bool gameStarted;
 
     public Vector3 toFollow;
     public PlayerController Player;
@@ -18,7 +21,7 @@ public class GameController : MonoBehaviour
     //GUI
     public GameObject worldTimerDisplay;
     public Text worldTimer;
-    public int startingTime;
+    public float startingTime;
 
 
 
@@ -33,13 +36,20 @@ public class GameController : MonoBehaviour
         else
             Destroy(this);
 
-        
+        gameStarted = false;
+    }
+
+    private void Start()
+    {
+        startingTime = startingTime * 60;
     }
 
     void Update()
     {
         UpdateToFollow(isPlayerDashing);
-        WorldTimer();
+        worldTimer.text = FormatTime(startingTime);
+        startingTime -= Time.deltaTime;
+        //Debug.Log(FormatTime(startingTime, Time.deltaTime));
         //Player.GetComponent<PlayerController>().focus = //Utility State enemies in list
     }
 
@@ -53,11 +63,6 @@ public class GameController : MonoBehaviour
         toFollow = Player.gameObject.transform.position;
     }
 
-    private void WorldTimer()
-    {
-
-    }
-
     public void ModifyWorldTimer(int minutes, int seconds)
     {
 
@@ -68,8 +73,8 @@ public class GameController : MonoBehaviour
         int cTime = (int)time;
         int minutes = cTime / 60;
         int seconds = cTime % 60;
-        float milliSeconds = time * 1000;
-        milliSeconds = (milliSeconds % 1000);
+        float milliSeconds = time * 100;
+        milliSeconds = (milliSeconds % 100);
 
         string timeString = String.Format("{0:00}:{1:00}:{2:00}", minutes, seconds, milliSeconds);
         return timeString;

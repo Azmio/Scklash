@@ -11,16 +11,20 @@ public class PlayerHealthScript : MonoBehaviour
     public bool staggered = false;
 
     public bool activeDeathTimer;
-    public float deathTimerDuration = 5f;
+    public static float deathTimerDuration = 5f;
+
+    public bool isDead;
 
     void Awake()
     {
-
+        isDead = false;
     }
 
     private void Start()
     {
         activeDeathTimer = false;
+
+        //Invoke("ActivateHealth", 10f);
     }
 
     public void HealthUpdate()
@@ -31,9 +35,14 @@ public class PlayerHealthScript : MonoBehaviour
             playerController.isInvulnerable = true;
         else
             playerController.isInvulnerable = false;
+        
+        if(EnemySpawner.instance != null)
+            currentHealth = EnemySpawner.instance.UtilityStatesInTheScene.Count;
 
+        if (!GameController.instance.gameStarted && currentHealth > 0)
+            GameController.instance.gameStarted = true;
 
-        if(currentHealth == 0 && !activeDeathTimer)
+        if(currentHealth == 0 && !activeDeathTimer && GameController.instance.gameStarted && !isDead)
         {
             activeDeathTimer = true;
 
@@ -86,27 +95,40 @@ public class PlayerHealthScript : MonoBehaviour
 
     IEnumerator DeathTimer()
     {
+        float timer = deathTimerDuration;
+
         playerController.deathTimer.text = deathTimerDuration.ToString();
         playerController.deathTimerDisplay.SetActive(true);
 
-        while(deathTimerDuration > 0)
+        while (timer > 0)
         {
-            deathTimerDuration -= Time.deltaTime;
+            timer -= Time.deltaTime;
 
-            playerController.deathTimer.text = GameController.instance.FormatTime(deathTimerDuration);
+            if (currentHealth > 0)
+            {
+                Debug.Log("Health Acquired!");
+                break;
+            }
+
+            playerController.deathTimer.text = GameController.instance.FormatTime(timer);
             yield return null;
         }
 
-        if(deathTimerDuration <= 0)
+        if (timer <= 0)
         {
+            isDead = true;
             Debug.Log("You dead for reals this time");
-            yield return null;
         }
 
         yield return null;
+        playerController.deathTimerDisplay.SetActive(false);
+        activeDeathTimer = false;
     }
 
-    
+    void ActivateHealth()
+    {
+        GameController.instance.gameStarted = true;
+    }
 
     /*public void Heal(int amount)
     {
