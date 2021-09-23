@@ -78,7 +78,10 @@ public class PlayerCombatScript : MonoBehaviour
         }
 
         if (playerController.inputHandler.GetKeyUp(PlayerActions.Attack) && isHolding)
+        {
             isHolding = false;
+            playerController.movementScript.canMove = true;
+        }
 
         if(isPressed)
         {

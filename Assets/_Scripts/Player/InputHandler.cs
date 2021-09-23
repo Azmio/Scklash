@@ -35,6 +35,8 @@ public class InputHandler : MonoBehaviour
             isMoving = true;
         else
             isMoving = false;
+
+        
     }
 
     public KeyCode GetKeyCode(PlayerActions currentAction) //Check key Code
@@ -95,5 +97,6 @@ public enum PlayerActions //Player Abilities to key bind
     Attack,
     Slash,
     Bloom,
-    Dash
+    Dash,
+    Pause
 }
