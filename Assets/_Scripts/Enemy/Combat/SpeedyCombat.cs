@@ -5,7 +5,9 @@ using UnityEngine;
 public class SpeedyCombat : EnemyCombat
 {
     // Start is called before the first frame update
+    
     CharacterController ec;
+    [Header("Attack Parameters")]
     public float knockBackSpeed;
     public void Awake()
     {
@@ -56,7 +58,7 @@ public class SpeedyCombat : EnemyCombat
             if (distanceCheck <= 1.4 && !isAttacking)
             {
                 //damage the player
-                _target.GetComponent<HealthScript>().Damage((int)damage);
+                _target.GetComponent<PlayerHealthScript>().Damage((int)damage);
                 isAttacking = true;
                 StartCoroutine(KnockbackTarget(_target.gameObject, transform.forward));
             }
@@ -66,5 +68,10 @@ public class SpeedyCombat : EnemyCombat
         doneAttacking = false;
         isBusy = false;
 
+    }
+
+    public override void StopAttacking()
+    {
+        StopAllCoroutines();
     }
 }

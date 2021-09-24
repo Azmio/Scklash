@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -320,7 +320,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &173839496
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -333,25 +333,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8027e3ff0f4b8014f86f2a5834d7a879, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rangedEnemy: {fileID: 3535754320255140036, guid: 8ec13e5c6fbb60446bc24ccc961f29a0, type: 3}
-  meleeEnemy: {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
-  flyBoy: {fileID: 2359666415028603131, guid: 3220c2bfcfab47646a0ab70e2c0a6c78, type: 3}
-  bigChungus: {fileID: 3535754320255140036, guid: d1741605ac1d1934cbab2c1ee2bea540, type: 3}
+  currentSceneDifficulty: 0
+  globalNextWaveDifficulty: 3
+  useGlobalDifficulty: 1
+  waveDelay: 1.5
+  waveNumber: 0
+  toLoop: 0
   waves:
   - name: First Wave
-    count: 5
+    enemiesInTheWave:
+    - name: Big chungus
+      enemyPrefab: {fileID: 3535754320255140036, guid: d1741605ac1d1934cbab2c1ee2bea540, type: 3}
+      count: 0
+    - name: melee guy
+      enemyPrefab: {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
+      count: 3
     spawnDelay: 1
+    minDifficultyForNextWave: 3
+    timeRequiredToClear: 40
   - name: Second Wave
-    count: 0
-    spawnDelay: 1
-  spawnPoints: []
-  waveDelay: 1
-  waveNumber: 0
-  nextWaveCountdown: 0
-  toLoop: 0
+    enemiesInTheWave:
+    - name: Melee Enemy
+      enemyPrefab: {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
+      count: 0
+    - name: Ranged Enemy
+      enemyPrefab: {fileID: 3535754320255140036, guid: 8ec13e5c6fbb60446bc24ccc961f29a0, type: 3}
+      count: 2
+    spawnDelay: 1.5
+    minDifficultyForNextWave: 3
+    timeRequiredToClear: 30
   enemiesInTheScene: []
   UtilityStatesInTheScene: []
   state: 2
+  prefabsForUtilityThief:
+  - {fileID: 3535754320255140036, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
 --- !u!4 &173839497
 Transform:
   m_ObjectHideFlags: 0
@@ -1183,7 +1198,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 2
-  m_Radius: 0.5
+  m_Radius: 0.3
   m_SlopeLimit: 5
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -1250,7 +1265,7 @@ MonoBehaviour:
   slashArc: 50
   bloomProjectilePrefab: {fileID: 125637760967015228, guid: 81c9598d0bd5cfc48ad36e75a8a88231, type: 3}
   bloomSource: {fileID: 5157483419436787840}
-  projectileForce: 20
+  projectileForce: 150
 --- !u!82 &1702546732
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1400,9 +1415,6 @@ MonoBehaviour:
   combatScript: {fileID: 1702546731}
   charController: {fileID: 1702546728}
   mCamera: {fileID: 0}
-  worldTimerDisplay: {fileID: 818931265}
-  worldTimer: {fileID: 582675301}
-  startingTime: 0
   deathTimerDisplay: {fileID: 54332432}
   deathTimer: {fileID: 2007692301}
   health: {fileID: 2059333061}
@@ -1505,8 +1517,6 @@ MonoBehaviour:
   worldTimerDisplay: {fileID: 0}
   worldTimer: {fileID: 0}
   startingTime: 0
-  deathTimerDisplay: {fileID: 0}
-  deathTimer: {fileID: 0}
 --- !u!4 &1889904481
 Transform:
   m_ObjectHideFlags: 0
