@@ -10,6 +10,7 @@ public class DamageZone : MonoBehaviour
     public float areaRadius =3f;
     public float timeUntilInitialises = 1.5f;
     public float timeItExistsFor = 0.5f;
+    public float playerKnockBackSpeed = 5f;
 
     SphereCollider damageZone;
 
@@ -48,7 +49,8 @@ public class DamageZone : MonoBehaviour
                 //damage player
                 isInZone = true;
                 Debug.Log("Player in the damage zone");
-                other.GetComponent<HealthScript>().Damage((int)damage);
+                other.GetComponent<PlayerHealthScript>().Damage((int)damage);
+                StartCoroutine(EnemyCombat.KnockbackEntity(GameController.instance.Player.gameObject, this.gameObject.transform.position, playerKnockBackSpeed));
             }
             else
             {

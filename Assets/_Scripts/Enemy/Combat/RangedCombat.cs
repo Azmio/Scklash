@@ -5,6 +5,7 @@ using UnityEngine;
 public class RangedCombat : EnemyCombat
 {
     //attack prefab
+    [Header("Attack Parameters")]
     public GameObject attackPrefab;
 
     public override void Attack()
@@ -27,4 +28,8 @@ public class RangedCombat : EnemyCombat
         doneAttacking = true;
     }
 
+    public override void StopAttacking()
+    {
+        StopAllCoroutines();
+    }
 }

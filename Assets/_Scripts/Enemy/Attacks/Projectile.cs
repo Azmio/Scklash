@@ -19,6 +19,9 @@ public class Projectile : MonoBehaviour
     public float offsetAngle;
 
     public float projectileDamage;
+
+    public float playerKnockBackSpeed = 2f;
+
     void Start()
     {
         InitialiseProjectile();
@@ -62,7 +65,8 @@ public class Projectile : MonoBehaviour
         {
             //Damage the player
             Debug.Log("Player Hit by projectile");
-            GameController.instance.Player.GetComponent<HealthScript>().Damage((int)projectileDamage);
+            StartCoroutine(EnemyCombat.KnockbackEntity(GameController.instance.Player.gameObject, this.gameObject.transform.position, playerKnockBackSpeed));
+            GameController.instance.Player.GetComponent<PlayerHealthScript>().Damage((int)projectileDamage);
             Destroy(this.gameObject);
         }
         else if(other.tag!="Enemy")

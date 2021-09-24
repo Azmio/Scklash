@@ -7,24 +7,17 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Soul-Soul
+  m_Name: Soul
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_ShaderKeywords: _SPECULAR_SETUP
-  m_LightmapFlags: 4
+  m_ShaderKeywords: _EMISSION _RECEIVE_SHADOWS_OFF
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-<<<<<<< refs/remotes/JKRibbz/Dev
-  m_CustomRenderQueue: 2000
-  stringTagMap:
-    RenderType: Opaque
-  disabledShaderPasses: []
-=======
   m_CustomRenderQueue: 3000
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses:
   - SHADOWCASTER
->>>>>>> Minor update
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -104,21 +97,21 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _ReceiveShadows: 1
+    - _ReceiveShadows: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 5
     - _Surface: 1
-    - _WorkflowMode: 0
+    - _WorkflowMode: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    - _BaseColor: {r: 0.055535767, g: 0.0778212, b: 0.5660378, a: 0.7254902}
     - _Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 0.12967698, g: 0.1254895, b: 0.23584908, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &8776831034386429851
+--- !u!114 &4040663663642593071
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
