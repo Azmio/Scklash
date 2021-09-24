@@ -1,17 +1,9 @@
 fileFormatVersion: 2
-guid: 0d61afd8be2fd8c4991ea76521da6e99
+guid: 2a27af6d928eeb04aa4a25b2907a819d
 ModelImporter:
   serializedVersion: 21100
-  internalIDToNameTable:
-  - first:
-      74: -3046981940176860024
-    second: BezierCurve|EmptyAction.001
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Soul
-    second: {fileID: 2100000, guid: bac8fe15a3ea95249858fd0bb0c714ff, type: 2}
+  internalIDToNameTable: []
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
