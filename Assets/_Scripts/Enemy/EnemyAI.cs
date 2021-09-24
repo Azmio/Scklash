@@ -28,6 +28,8 @@ public class EnemyAI : MonoBehaviour
 
     public GameObject soulModel;
 
+    public List<EnemyAI> explosionObjects;
+
     //Distance between player/target position to the enemy
     float distance;
 
@@ -45,7 +47,11 @@ public class EnemyAI : MonoBehaviour
 
     private void Start()
     {
-        soulModel.SetActive(false);
+        if (!enemyType.Equals(Type.UtilityThief))
+        {
+            soulModel.SetActive(false);
+        }
+        
         enemyModel.SetActive(true);
       //  Debug.Log(GetPreciseDistance(GameController.instance.Player.transform.position, this.transform.position));
         enemyMovement.InitialiseMovement();
@@ -424,10 +430,21 @@ public class EnemyAI : MonoBehaviour
     {
         Vector3 epicenter = this.gameObject.transform.position;
         List<EnemyAI> targetObjects = new List<EnemyAI>();
-        Debug.Log("Sup mf im exploding");
-        foreach(EnemyAI enemy in EnemySpawner.instance.enemiesInTheScene)
+
+
+        Collider[] colliders = Physics.OverlapSphere(epicenter, enemyCombat.explosionRange, 1 << 8);
+
+        foreach(Collider targetEntity in colliders)
         {
-            if (GetPreciseDistance(this.transform.position, enemy.transform.position) < enemyCombat.explosionRange || enemy.gameObject!=this.gameObject)
+            targetObjects.Add(targetEntity.gameObject.GetComponent<EnemyAI>());
+        }
+
+
+
+        /*
+        foreach (EnemyAI enemy in EnemySpawner.instance.enemiesInTheScene)
+        {
+            if (GetPreciseDistance(this.transform.position, enemy.transform.position) < enemyCombat.explosionRange && enemy.gameObject!=this.gameObject)
             {
 
                     targetObjects.Add(this);
@@ -437,17 +454,19 @@ public class EnemyAI : MonoBehaviour
         }
         foreach (EnemyAI enemy in EnemySpawner.instance.UtilityStatesInTheScene)
         {
-            if (GetPreciseDistance(this.transform.position, enemy.transform.position) < enemyCombat.explosionRange)
+            if (GetPreciseDistance(this.transform.position, enemy.transform.position) < enemyCombat.explosionRange && enemy.gameObject!=this.gameObject)
             {
                 targetObjects.Add(this);
             }
         }
-        
+        */
         Debug.Log(targetObjects);
+        explosionObjects = targetObjects;
 
         foreach(EnemyAI target in targetObjects)
         {
             Debug.Log(target.gameObject);
+
             target.enemyHealthSystem.Damage(4);
 
             if (target.canBeKnocked)
