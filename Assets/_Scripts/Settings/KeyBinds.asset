@@ -21,3 +21,5 @@ MonoBehaviour:
     keyCode: 113
   - action: 3
     keyCode: 32
+  - action: 4
+    keyCode: 112
