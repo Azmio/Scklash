@@ -2,11 +2,96 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    [Tooltip("Camera Distance not in use")]
+    [SerializeField]
+    internal InputHandler inputHandler;
 
+    [SerializeField]
+    internal PlayerHealthScript playerHealth;
+
+    [SerializeField]
+    internal PlayerMovementScript movementScript;
+
+    [SerializeField]
+    internal PlayerCombatScript combatScript;
+
+    public CharacterController charController;
+    public Camera mCamera;
+
+    public GameObject deathTimerDisplay;
+    public Text deathTimer;
+
+    public Text health;
+    public Text displaySpeedMult;
+    //public Quaternion lookRotation;
+
+    internal bool isBusy, isInvulnerable;
+
+    //Animations shiz
+    public Animator anim;
+    [SerializeField]
+    private Vector3 animBlendVector;
+    Vector3 animVelocity;
+    public float animSmoothTime = 0.1f;
+
+    //int verticalAnimationID;
+    //int horizontalAnimationID;
+    
+
+
+    private void Awake()
+    {
+        charController = GetComponent<CharacterController>();//Find attached component
+        mCamera = Camera.main;
+        deathTimerDisplay.SetActive(false);
+
+        //verticalAnimationID = Animator.StringToHash("Vertical");
+        //horizontalAnimationID = Animator.StringToHash("Horizontal");
+
+    }
+
+    private void Start()
+    {
+        isBusy = false;
+        isInvulnerable = false;
+
+
+    }
+
+    private void Update()
+    {       
+        movementScript.MovementUpdate();
+        combatScript.CombatUpdate();
+        playerHealth.HealthUpdate();
+
+        //animBlendVector = Vector3.SmoothDamp(animBlendVector, inputHandler.movementVector, ref animVelocity, animSmoothTime);
+
+        //anim.SetFloat(verticalAnimationID, animBlendVector.z);
+        //anim.SetFloat(horizontalAnimationID, animBlendVector.x);
+
+        anim.SetBool(Animator.StringToHash("isMoving"), inputHandler.isMoving);
+        //anim.SetInteger(Animator.StringToHash("AttackIndex"), combatScript.comboIndex);
+        //anim.SetBool(Animator.StringToHash("isAttacking"), combatScript.isAttacking);
+
+
+
+        Debug.Log("isMoving: " + inputHandler.isMoving.ToString() + " isAttacking: " + combatScript.isAttacking.ToString() + " comboIndex: " + combatScript.comboIndex.ToString());
+
+        health.text = "HP: " + playerHealth.currentHealth.ToString();
+        displaySpeedMult.text = movementScript.speedMultiplier.ToString("F1") + "x";
+    }
+
+    
+
+    private void StartUp()
+    {
+        
+    }
+
+    /***
     private InputHandler inputHandler;
     private CharacterController pController;
     private Camera mCamera;
@@ -171,7 +256,7 @@ public class PlayerController : MonoBehaviour
         lastPosition = transform.position;
     }*/
 
-    private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
+    /***private void MoveToTarget(Vector3 target) //Move and then rotate character to target direction
     {
         float cFocus = (float)focus;
         moveSpeedModifier = Mathf.Lerp(1f, 1.7f, cFocus/100);
@@ -499,5 +584,5 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(resetTime + 5f);
         Debug.Log("bloom end");
         isBusy = false;
-    }
+    }*/
 }
