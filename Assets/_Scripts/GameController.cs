@@ -23,7 +23,7 @@ public class GameController : MonoBehaviour
     public Text worldTimer;
     public float startingTime;
 
-
+    public bool isPaused;
 
     void Awake() //Set up
     {
@@ -37,6 +37,7 @@ public class GameController : MonoBehaviour
             Destroy(this);
 
         gameStarted = false;
+        isPaused = false;
     }
 
     private void Start()
@@ -51,6 +52,20 @@ public class GameController : MonoBehaviour
         startingTime -= Time.deltaTime;
         //Debug.Log(FormatTime(startingTime, Time.deltaTime));
         //Player.GetComponent<PlayerController>().focus = //Utility State enemies in list
+
+        if (inputHandler.GetKeyDown(PlayerActions.Pause))
+        {
+            if(isPaused)
+            {
+                Time.timeScale = 1;
+                isPaused = false;
+            }
+            else if(!isPaused)
+            {
+                Time.timeScale = 0;
+                isPaused = true;
+            }
+        }
     }
 
     void UpdateToFollow(bool dashCheck)

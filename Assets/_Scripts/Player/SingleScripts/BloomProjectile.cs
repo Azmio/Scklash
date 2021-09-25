@@ -7,18 +7,13 @@ public class BloomProjectile : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
 
-    private void OnBecameInvisible()
-    {
-        Destroy(this.gameObject);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -28,27 +23,23 @@ public class BloomProjectile : MonoBehaviour
         {
             EnemyAI enemyScript = other.GetComponent<EnemyAI>();
 
-            if(enemyScript != null)
+            if (enemyScript != null)
             {
-                /*if(enemyScript.isUtility)
+                if (enemyScript.enemyType == EnemyAI.Type.Utility)
                 {
-                    //explode script
+                    enemyScript.Explode();
                 }
                 else
                 {
-                    //deal a ping of damage
-                }*/
-            }
-            else
-            {
-                //probably a breakable object - do something?
-            }
+                    enemyScript.enemyHealthSystem.Damage(1);
+                }
 
-            Destroy(this.gameObject);
+                Destroy(this.gameObject);
+            }
         }
         else
         {
-            
+            Destroy(this.gameObject);
         }
     }
 }

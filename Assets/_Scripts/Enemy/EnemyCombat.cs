@@ -20,16 +20,42 @@ public class EnemyCombat : MonoBehaviour
 
     public int soulValue = 1;
 
-
     public bool isBusy = false;
+
+
+    [Header("Explosion Parameters")]
+    public float explosionRange = 5f;
+    public int explosionDamage = 4;
+    public float explosionKnockBackDuration = 0.4f;
+
 
     public virtual void Attack()
     {
         Debug.Log("I do nothing");
     }
 
+    public virtual void StopAttacking()
+    {
+        Debug.Log("I do nothing");
+    }
+    public static IEnumerator KnockbackEntity(GameObject target, Vector3 knockbackEpicenter, float playerKnockBackSpeed = 2f, float knockBackDuration = 0.2f)
+    {
+        Debug.Log("Exploding");
+        float startTime = Time.time;
 
-    
+        Vector3 knockbackDirection = (target.transform.position - knockbackEpicenter).normalized;
+        Debug.Log("player knockback speed" + playerKnockBackSpeed);
+        while (Time.time < startTime + knockBackDuration)
+        {
+            Debug.Log("adding force");
+            target.GetComponent<CharacterController>().Move(knockbackDirection * playerKnockBackSpeed * Time.deltaTime);
+
+            yield return null;
+        }
+
+        yield return null;
+
+    }
 }
 
 

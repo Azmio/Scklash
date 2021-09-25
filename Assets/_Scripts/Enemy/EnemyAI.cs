@@ -16,11 +16,17 @@ public class EnemyAI : MonoBehaviour
 
     public HealthScript enemyHealthSystem;
 
+    public float minSpawnDistanceFromPlayer;
+
     public float attackRange;
 
     public bool isActive=true;
 
     public bool canBeKnocked = false;
+
+    public GameObject enemyModel;
+
+    public GameObject soulModel;
 
     //Distance between player/target position to the enemy
     float distance;
@@ -34,15 +40,18 @@ public class EnemyAI : MonoBehaviour
         enemyMovement = this.gameObject.GetComponent<EnemyMovement>();
         enemyCombat = this.gameObject.GetComponent<EnemyCombat>();
         enemyHealthSystem = this.gameObject.GetComponent<HealthScript>();
+        
     }
 
     private void Start()
     {
-        
+        soulModel.SetActive(false);
+        enemyModel.SetActive(true);
+      //  Debug.Log(GetPreciseDistance(GameController.instance.Player.transform.position, this.transform.position));
         enemyMovement.InitialiseMovement();
         enemyHealthSystem.healthBarCanvas = this.transform.Find("Canvas").gameObject;
         EnemySpawner.instance.enemiesInTheScene.Add(this);
-
+        //this.gameObject.SetActive(false);
         if (enemyType == Type.Utility)
         {
             enemyMovement.agent.enabled = false;
@@ -181,8 +190,22 @@ public class EnemyAI : MonoBehaviour
         }
     }
  
+    public void StunMe(float duration=0.8f)
+    {
+        //Don't stun utility thieves
+        if (enemyType == Type.UtilityThief)
+            return;
 
+        isActive = false;
+        enemyCombat.StopAttacking();
+        StartCoroutine(ChangeToActive(duration));
+    }
 
+    IEnumerator ChangeToActive(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isActive = true;
+    }
     void BigChungusActions()
     {
         //if player is stunned
@@ -252,7 +275,8 @@ public class EnemyAI : MonoBehaviour
 
     void ChangeToUtility()
     {
-
+        soulModel.SetActive(true);
+        enemyModel.SetActive(false);
         enemyCombat.StopAllCoroutines();
         enemyCombat.enabled = false;
 
@@ -269,18 +293,22 @@ public class EnemyAI : MonoBehaviour
 
         currentAction = State.Utility;
         enemyHealthSystem.healthBarCanvas.SetActive(false);
+        enemyType = Type.Utility;
         //Debug.Log(EnemySpawner.enemySpawner.UtilityStatesInTheScene[0]);
     }
     public void DestroyUtility()
     {
+        Debug.Log("dESTROYING UTILITY");
         EnemySpawner.instance.UtilityStatesInTheScene.Remove(this);
         Destroy(this.gameObject);
     }
-
+    
     void ManageHealthSystem()
     {
         enemyHealthSystem.healthBarCanvas.transform.rotation = Camera.main.transform.rotation;
-        enemyHealthSystem.healthSlider.targetGraphic.color = Color.Lerp(Color.red, Color.green, enemyHealthSystem.currentHealth / 100f);
+
+        //type casting to get float values for the t element of the lerp
+        enemyHealthSystem.healthSlider.targetGraphic.color = Color.Lerp(Color.red, Color.green, (enemyHealthSystem.currentHealth / (float)enemyHealthSystem.maxHealth));
 
         if (enemyHealthSystem.currentHealth <= 0 && enemyType != Type.Utility)
         {
@@ -289,11 +317,17 @@ public class EnemyAI : MonoBehaviour
                 
                 while (enemyCombat.soulValue > 0)
                 {
-                    EnemySpawner.instance.SpawnEnemy(EnemySpawner.instance.meleeEnemy);
+                    // EnemySpawner.instance.SpawnEnemy(EnemySpawner.instance.meleeEnemy);
+                    GameObject temp = EnemySpawner.instance.prefabsForUtilityThief[Random.Range(0, EnemySpawner.instance.prefabsForUtilityThief.Count)];
+                    EnemySpawner.instance.SpawnEnemy(temp.GetComponent<EnemyAI>());
+                    //To do fix enemy spawn with utility state enemies
                     enemyCombat.soulValue--;
                 }
-                isActive = false;
-                //StartCoroutine(DisableTemporarily());
+                if (isActive)
+                {
+                    StartCoroutine(TryAndReset());
+                }
+                //TryAndReset();
                 
             }
             else
@@ -304,12 +338,54 @@ public class EnemyAI : MonoBehaviour
             }
         }
     }
+    IEnumerator TryAndReset()
+    {
+        isActive = false;
+        float chanceModifier = 0.05f * EnemySpawner.instance.UtilityStatesInTheScene.Count;
+        Debug.Log("Trying to reset");
+        float rand = Random.Range(1, 100)/100f;
+        while (rand >= chanceModifier)
+        {
+            Debug.Log("Rejecting reset with rand value " + rand + " and chance modifier " + chanceModifier);
+
+            rand = Random.Range(1, 100) / 100f;
+
+            chanceModifier = 0.05f * EnemySpawner.instance.UtilityStatesInTheScene.Count;
+
+            yield return new WaitForSeconds(1.5f);
+        }
+
+        Debug.Log("Resetting with rand value " + rand + " and chance modifier " + chanceModifier);
+        enemyHealthSystem.currentHealth = enemyHealthSystem.maxHealth;
+        enemyHealthSystem.healthSlider.value = enemyHealthSystem.currentHealth;
+        enemyCombat.soulValue = 0;
+        isActive = true;
+
+        yield break;
+    }
+    private void tryAndReset()
+    {
+        float chanceModifier = 0.05f * EnemySpawner.instance.UtilityStatesInTheScene.Count;
+        Debug.Log("Trying to reset");
+        float rand = Random.Range(1,100);
+        rand /= 100;
+        if ( rand <= chanceModifier)
+        {
+            Debug.Log("Resetting with rand value "+rand+" and chance modifier "+chanceModifier);
+            enemyHealthSystem.currentHealth = enemyHealthSystem.maxHealth;
+            enemyHealthSystem.healthSlider.value = enemyHealthSystem.currentHealth;
+            ManageHealthSystem();
+            enemyCombat.soulValue = 0;
+            isActive = true;
+        }
+    }
 
     IEnumerator DisableTemporarily()
     {
         isActive = false;
         yield return new WaitForSeconds(enemyCombat.strikeDelay);
         enemyHealthSystem.currentHealth = enemyHealthSystem.maxHealth;
+        ManageHealthSystem();
         enemyCombat.soulValue = 0;
         isActive = true;
 
@@ -320,6 +396,69 @@ public class EnemyAI : MonoBehaviour
         _a.y = 0;
         _b.y = 0;
         return Mathf.Round(Vector3.Distance(_a, _b) * 100) / 100;
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Debug.Log("HITTT");
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("projectile hit");
+        if (collision.collider.gameObject.tag == "PlayerProjectile")
+        {
+            if (enemyType == Type.Utility)
+            {
+                Explode();
+            }
+            else
+            {
+                enemyHealthSystem.Damage(1);
+            }
+
+            Destroy(collision.collider.gameObject);
+        }
+    }
+
+    public void Explode()
+    {
+        Vector3 epicenter = this.gameObject.transform.position;
+        List<EnemyAI> targetObjects = new List<EnemyAI>();
+        Debug.Log("Sup mf im exploding");
+        foreach(EnemyAI enemy in EnemySpawner.instance.enemiesInTheScene)
+        {
+            if (GetPreciseDistance(this.transform.position, enemy.transform.position) < enemyCombat.explosionRange || enemy.gameObject!=this.gameObject)
+            {
+
+                    targetObjects.Add(this);
+
+                Debug.Log("adding enemies to explosion list ");
+            }
+        }
+        foreach (EnemyAI enemy in EnemySpawner.instance.UtilityStatesInTheScene)
+        {
+            if (GetPreciseDistance(this.transform.position, enemy.transform.position) < enemyCombat.explosionRange)
+            {
+                targetObjects.Add(this);
+            }
+        }
+        
+        Debug.Log(targetObjects);
+
+        foreach(EnemyAI target in targetObjects)
+        {
+            Debug.Log(target.gameObject);
+            target.enemyHealthSystem.Damage(4);
+
+            if (target.canBeKnocked)
+            {
+                StartCoroutine(EnemyCombat.KnockbackEntity(target.gameObject, epicenter, 20, 0.3f));
+            }
+            
+        }
+
+        DestroyUtility();
+
     }
 }
 

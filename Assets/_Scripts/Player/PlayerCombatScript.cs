@@ -52,8 +52,7 @@ public class PlayerCombatScript : MonoBehaviour
     public void CombatUpdate()
     {
         if (playerController.inputHandler.GetKeyDown(PlayerActions.Attack) && !playerController.isBusy) //If Attack Button is active
-        {
-            
+        {           
             //Debug.Log("Button Down");
             isPressed = true;
             playerController.movementScript.canMove = false;
@@ -78,7 +77,10 @@ public class PlayerCombatScript : MonoBehaviour
         }
 
         if (playerController.inputHandler.GetKeyUp(PlayerActions.Attack) && isHolding)
+        {
             isHolding = false;
+            playerController.movementScript.canMove = true;
+        }
 
         if(isPressed)
         {
@@ -91,7 +93,7 @@ public class PlayerCombatScript : MonoBehaviour
             }
         }
 
-        if(isHolding)
+        if(isHolding && isPressed)
         {
             //bool abilityComplete = false;
             playerController.anim.Play("Attack1");
@@ -105,6 +107,7 @@ public class PlayerCombatScript : MonoBehaviour
                 //abilityComplete = true;
             }
             //Debug.Log("knockback complete");
+            timer = 0.3f;
             isPressed = false;
         }
 
@@ -160,9 +163,7 @@ public class PlayerCombatScript : MonoBehaviour
     {
         playerController.isBusy = true;
         playerController.movementScript.canMove = false;
-        playerController.movementScript.RotateToClickLocation();
-
-        
+        playerController.movementScript.RotateToClickLocation();        
 
         Debug.Log("attacking");
 
@@ -222,6 +223,10 @@ public class PlayerCombatScript : MonoBehaviour
         else
             comboIndex = 0;
 
+
+        if (comboIndex == 3)
+            comboIndex = 0;
+
         playerController.isBusy = false;
         playerController.movementScript.canMove = true;        
         yield return new WaitForSeconds(resetTime);
@@ -230,7 +235,7 @@ public class PlayerCombatScript : MonoBehaviour
     IEnumerator KnockbackTarget(Vector3 kPosition, GameObject target) //Knockback ability
     {
         playerController.isBusy = true;
-
+        playerController.movementScript.canMove = false;
         //if(target.GetComponent<EnemyAI>().knockbackable)
 
         float startTime = Time.time;
@@ -247,6 +252,7 @@ public class PlayerCombatScript : MonoBehaviour
         }        
 
         playerController.isBusy = false;
+        playerController.movementScript.canMove = true;
     }
 
     IEnumerator Slash(float resetTime)

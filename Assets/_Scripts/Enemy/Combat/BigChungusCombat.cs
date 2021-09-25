@@ -5,6 +5,7 @@ using UnityEngine;
 public class BigChungusCombat : EnemyCombat
 {
     //attack prefab
+    [Header("Attack Parameters")]
     public GameObject attackPrefab;
 
     public override void Attack()
@@ -23,5 +24,10 @@ public class BigChungusCombat : EnemyCombat
         isBusy = false;
         isAttacking = false;
 
+    }
+
+    public override void StopAttacking()
+    {
+        StopAllCoroutines();
     }
 }
