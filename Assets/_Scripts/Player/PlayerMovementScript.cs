@@ -52,7 +52,9 @@ public class PlayerMovementScript : MonoBehaviour
         }
 
         if (playerController.playerHealth.currentHealth >= 6)
-            utilityQuantity = 6;
+            utilityQuantity = 6f;
+        else if (playerController.playerHealth.currentHealth <= 0)
+            utilityQuantity = 3.4f;
         else
             utilityQuantity = (float)playerController.playerHealth.currentHealth;
 
