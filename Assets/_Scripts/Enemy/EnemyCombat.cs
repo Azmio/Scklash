@@ -24,7 +24,7 @@ public class EnemyCombat : MonoBehaviour
 
 
     [Header("Explosion Parameters")]
-    public float explosionRange = 5f;
+    public float explosionRange = 10f;
     public int explosionDamage = 4;
     public float explosionKnockBackDuration = 0.4f;
 
