@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1478,7 +1478,7 @@ MonoBehaviour:
   slashArc: 50
   bloomProjectilePrefab: {fileID: 125637760967015228, guid: 81c9598d0bd5cfc48ad36e75a8a88231, type: 3}
   bloomSource: {fileID: 5157483419436787840}
-  projectileForce: 150
+  projectileForce: 600
 --- !u!82 &1702546732
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1606,10 +1606,10 @@ MonoBehaviour:
   playerController: {fileID: 1702546735}
   speedMultiplier: 1
   rotationSpeed: 10
-  movementSpeed: 5
+  movementSpeed: 7
   canMove: 1
   dashSpeed: 20
-  dashTime: 0.3
+  dashTime: 0.2
 --- !u!114 &1702546735
 MonoBehaviour:
   m_ObjectHideFlags: 0
