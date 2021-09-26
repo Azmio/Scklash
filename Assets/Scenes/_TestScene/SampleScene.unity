@@ -1460,7 +1460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerController: {fileID: 1702546735}
-  attackRange: 5
+  attackRange: 3
   attackArc: 150
   attackResetTime: 1
   targetList: []

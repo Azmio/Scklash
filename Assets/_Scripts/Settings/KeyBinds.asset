@@ -18,7 +18,7 @@ MonoBehaviour:
   - action: 1
     keyCode: 101
   - action: 2
-    keyCode: 113
+    keyCode: 324
   - action: 3
     keyCode: 32
   - action: 4
