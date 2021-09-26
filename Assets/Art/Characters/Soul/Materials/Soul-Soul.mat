@@ -13,18 +13,11 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-<<<<<<< refs/remotes/JKRibbz/Dev
-  m_CustomRenderQueue: 2000
-  stringTagMap:
-    RenderType: Opaque
-  disabledShaderPasses: []
-=======
   m_CustomRenderQueue: 3000
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses:
   - SHADOWCASTER
->>>>>>> Minor update
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:

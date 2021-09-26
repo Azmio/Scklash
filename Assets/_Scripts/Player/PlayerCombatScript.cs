@@ -192,7 +192,7 @@ public class PlayerCombatScript : MonoBehaviour
                     comboIndex++;
                     Debug.Log("Combo 3");
 
-                    //attackDamageMultiplier += 2;
+                    attackDamageMultiplier += 2;
                     //animation 3
                     //sound3
                     break;
@@ -258,9 +258,7 @@ public class PlayerCombatScript : MonoBehaviour
     IEnumerator Slash(float resetTime)
     {
         playerController.isBusy = true;
-        //playerController.movementScript.canMove = false;
-        //playerController.isInvulnerable = true;
-        playerController.movementScript.RotateToClickLocation();
+        playerController.movementScript.canMove = false;
         bool slicable = false;
         
         if (detectAttackable(slashRange, slashArc, 8)) //Detect Potential Slash Targets
@@ -274,9 +272,8 @@ public class PlayerCombatScript : MonoBehaviour
                 if (enemyHealth.currentHealth <= 0) //Enemy should be in utility state
                 {
                     targetEnemyList.Add(enemyHealth.gameObject);    //Target added to list
-                    Physics.IgnoreLayerCollision(0, 8, true);
-                    slicable = true;                                //Potential Target active
-                                        
+                    //slicable = true;                                //Potential Target active
+                    Physics.IgnoreLayerCollision(0, 8, true);       //Prevent player collision                    
                 }
             }
 
@@ -296,37 +293,25 @@ public class PlayerCombatScript : MonoBehaviour
                             targetEnemy = target;
                         }
                     }
-                    Physics.IgnoreLayerCollision(0, 8, true);       //Prevent player collision
+
                     playerController.movementScript.RotateToTarget(targetEnemy.transform);          //Rotate to enemy
                     StartCoroutine(playerController.movementScript.Dash(0f));                       //Activate Dashh Through
                     //Set off utility state explosion                    
                 }
                 else
                 {
-                    Debug.Log("bork 1");
-
-                    Physics.IgnoreLayerCollision(0, 8, true);       //Prevent player collision
-                    Debug.Log("bork 2");
-
                     playerController.movementScript.RotateToTarget(targetEnemyList[0].transform);   //Rotate to enemy
-                    Debug.Log("bork 3");
-
                     StartCoroutine(playerController.movementScript.Dash(0f));                       //Activate Dash Through
-                    Debug.Log("bork 4");
-
                     //Set off utility state explosion
                 }
             }
         }
-        yield return new WaitForSeconds(1f);
+
         Physics.IgnoreLayerCollision(0, 8, false);
-        //transform.GetComponent<HealthScript>().invulnerable = false;
-        playerController.isInvulnerable = false;
+        transform.GetComponent<HealthScript>().invulnerable = false;
         playerController.isBusy = false;
         playerController.movementScript.canMove = true;
         yield return new WaitForSeconds(resetTime);
-        playerController.movementScript.canMove = true;
-        Physics.IgnoreLayerCollision(0, 8, false);
     }   
 
     IEnumerator Bloom(float resetTime)

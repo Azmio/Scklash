@@ -354,7 +354,7 @@ MonoBehaviour:
   isBusy: 0
   explosionRange: 5
   explosionDamage: 4
-  explosionKnockBackDuration: 0.4
+  explosionKnockBackDuration: 0.8
   attackPrefab: {fileID: 2234940398615667336, guid: 2a9bb54c8b7bf1a4bb0c312e7426c314, type: 3}
 --- !u!208 &-8194324696951376554
 NavMeshObstacle:

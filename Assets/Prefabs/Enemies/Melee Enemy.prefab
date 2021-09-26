@@ -354,7 +354,7 @@ MonoBehaviour:
   isBusy: 0
   explosionRange: 5
   explosionDamage: 4
-  explosionKnockBackDuration: 0.4
+  explosionKnockBackDuration: 0.8
   knockBackSpeed: 30
 --- !u!208 &-4638439419918352235
 NavMeshObstacle:
