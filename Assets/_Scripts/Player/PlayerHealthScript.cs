@@ -70,7 +70,21 @@ public class PlayerHealthScript : MonoBehaviour
     {
         if (!playerController.isInvulnerable) //Check if able to damage
         {
-            currentHealth -= amount;                        
+            //currentHealth -= amount;
+            GameObject closestEnemy = new GameObject();
+
+            foreach (EnemyAI target in EnemySpawner.instance.UtilityStatesInTheScene)
+            {
+                if (closestEnemy == null)
+                    closestEnemy = target.gameObject;
+
+                if (Vector3.Distance(this.transform.position, target.transform.position) < Vector3.Distance(this.transform.position, closestEnemy.transform.position))
+                {
+                    closestEnemy = target.gameObject;
+                }
+            }
+
+            closestEnemy.GetComponent<EnemyAI>().DestroyUtility();
         }
 
         if (currentHealth > 0)

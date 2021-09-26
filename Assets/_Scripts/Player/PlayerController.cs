@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-        Debug.Log("isMoving: " + inputHandler.isMoving.ToString() + " isAttacking: " + combatScript.isAttacking.ToString() + " comboIndex: " + combatScript.comboIndex.ToString());
+        //Debug.Log("isMoving: " + inputHandler.isMoving.ToString() + " isAttacking: " + combatScript.isAttacking.ToString() + " comboIndex: " + combatScript.comboIndex.ToString());
 
         health.text = "HP: " + playerHealth.currentHealth.ToString();
         displaySpeedMult.text = movementScript.speedMultiplier.ToString("F1") + "x";

@@ -840,10 +840,10 @@ RectTransform:
   m_Father: {fileID: 1501605300}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.34389654, y: 0.7346459}
+  m_AnchorMax: {x: 0.6587413, y: 1}
+  m_AnchoredPosition: {x: -1.5, y: -389.5}
+  m_SizeDelta: {x: 651, y: 307}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &818931267
 MonoBehaviour:
@@ -1218,7 +1218,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -535.8, y: -383.9}
+  m_AnchoredPosition: {x: -310, y: -155}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1549358869
@@ -1305,7 +1305,6 @@ GameObject:
   - component: {fileID: 1702546734}
   - component: {fileID: 1702546731}
   - component: {fileID: 1702546730}
-  - component: {fileID: 1702546736}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1391,7 +1390,7 @@ MonoBehaviour:
   KnockbackDuration: 0.3
   knockbackSpeed: 20
   slashRange: 5
-  slashArc: 50
+  slashArc: 75
   bloomProjectilePrefab: {fileID: 125637760967015228, guid: 81c9598d0bd5cfc48ad36e75a8a88231, type: 3}
   bloomSource: {fileID: 5157483419436787840}
   projectileForce: 100
@@ -1551,24 +1550,6 @@ MonoBehaviour:
   anim: {fileID: 5059487417941690460}
   animBlendVector: {x: 0, y: 0, z: 0}
   animSmoothTime: 0.1
---- !u!114 &1702546736
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1702546727}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4875e130e8ee0d6429d4b32d6b06c74a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 100
-  currentHealth: 0
-  healthBarCanvas: {fileID: 1501605296}
-  healthSlider: {fileID: 0}
-  invulnerable: 0
-  safeDistance: 0
 --- !u!4 &1710271980 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b8813c60e5bb83f40871862c66f1c186, type: 3}
@@ -1862,7 +1843,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -641.1, y: -387}
+  m_AnchoredPosition: {x: -379, y: -177}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2059333061
