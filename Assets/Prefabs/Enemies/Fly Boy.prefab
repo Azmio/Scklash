@@ -39,6 +39,10 @@ PrefabInstance:
       propertyPath: attackRange
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2479958735758191994, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
+      propertyPath: canBeKnocked
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2589003919024924533, guid: 7042d4cffa8b2f24faf4b1ef2e652d68, type: 3}
       propertyPath: damage
       value: 3.5

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Wire : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public EnemyAI parentObject;
+
     public GameObject target;
     //wire mesh and material
     public GameObject wireRef;
@@ -58,7 +59,7 @@ public class Wire : MonoBehaviour
         succParticles.Play();
         while (startTime < endTime)
         {
-            if (target == null)
+            if (target == null||!parentObject.isActive)
             {
                 doneAbsorbing = false;
                 break;

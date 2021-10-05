@@ -46,16 +46,22 @@ public class HealthScript : MonoBehaviour
         if(!invulnerable) //Check if able to damage
         {
             currentHealth -= amount;
+            FMODUnity.RuntimeManager.PlayOneShot ("event:/MetalHit",  transform.position);              //PLAY SOUND OF BEING HIT
             healthSlider.value = currentHealth;
         }
 
         if (currentHealth > 0)
             return false;
         else
+        {
+            FMODUnity.RuntimeManager.PlayOneShot ("event:/EnemyDeath1",  transform.position);            //PLAY SOUND OF DEATH
             return true;
+        }
+           
 
-       // if (currentHealth <= 0) //If health depleted, destroy this object
-       //   Destroy(gameObject);
+       // if (currentHealth <= 0) 
+        
+       //   Destroy(gameObject); If health depleted, destroy this object
     }
 
     public void Heal(int amount)

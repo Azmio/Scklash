@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class UtilityThiefCombat : EnemyCombat
 {
+    [Header("Attack Parameters")]
     public GameObject attackPrefab;
 
     public float timeRequiredToSuck;
@@ -60,6 +61,7 @@ public class UtilityThiefCombat : EnemyCombat
         Wire temp = Instantiate(attackPrefab, spawnTemp, Quaternion.LookRotation(lookDir, Vector3.up)).GetComponent<Wire>();
         //Switch the wire's target to utility state
         temp.target = enemyTarget;
+        temp.parentObject = this.gameObject.GetComponent<EnemyAI>();
         temp.timeRequiredToAbsorb = timeRequiredToSuck;
 
         //wait for the wire to grow, absorb and shrink back into the ground
@@ -97,5 +99,6 @@ public class UtilityThiefCombat : EnemyCombat
         }
         return targetPosition;
     }
+
 
 }

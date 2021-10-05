@@ -4,9 +4,20 @@ ModelImporter:
   serializedVersion: 21100
   internalIDToNameTable:
   - first:
+<<<<<<< refs/remotes/JKRibbz/Dev
       74: -5896388890046054980
     second: BezierCurve|BezierCurve|BezierCurve|EmptyAction.001|BezierCurve|EmptyAction
   externalObjects: {}
+=======
+      74: -3046981940176860024
+    second: BezierCurve|EmptyAction.001
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Soul
+    second: {fileID: 2100000, guid: bac8fe15a3ea95249858fd0bb0c714ff, type: 2}
+>>>>>>> Minor update
   materials:
     materialImportMode: 2
     materialName: 0

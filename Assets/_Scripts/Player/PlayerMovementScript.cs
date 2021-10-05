@@ -33,7 +33,7 @@ public class PlayerMovementScript : MonoBehaviour
         canMove = true;
         speedMultiplier = 1f;
     }
-
+    float utilityQuantity;
     public void MovementUpdate()
     {
         if (canMove) //player is able to move
@@ -50,6 +50,16 @@ public class PlayerMovementScript : MonoBehaviour
 
             transform.position = currentPos;
         }
+
+        if (playerController.playerHealth.currentHealth >= 6)
+            utilityQuantity = 6f;
+        else if (playerController.playerHealth.currentHealth <= 0)
+            utilityQuantity = 3.4f;
+        else
+            utilityQuantity = (float)playerController.playerHealth.currentHealth;
+
+        
+        speedMultiplier = utilityQuantity * 0.3f;
     }
 
     public void RotateToTarget(Transform target)
@@ -97,7 +107,7 @@ public class PlayerMovementScript : MonoBehaviour
         float startTime = Time.time; //Set initial time stamp
 
         playerController.isBusy = true;
-        canMove = false;
+        //canMove = false;
         GameController.isPlayerDashing = true;
 
         //Animate

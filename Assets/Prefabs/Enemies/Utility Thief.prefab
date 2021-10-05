@@ -247,7 +247,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2359666415028603131}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.8
   m_Speed: 3.5
@@ -278,9 +278,13 @@ MonoBehaviour:
   enemyMovement: {fileID: 0}
   enemyCombat: {fileID: 0}
   enemyHealthSystem: {fileID: 0}
+  minSpawnDistanceFromPlayer: 0
   attackRange: 5
   isActive: 1
   canBeKnocked: 0
+  enemyModel: {fileID: 9039307891395969358}
+  soulModel: {fileID: 0}
+  explosionObjects: []
   currentAction: 0
 --- !u!114 &2753100958150609324
 MonoBehaviour:
@@ -317,12 +321,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 3
-  strikeDelay: 5
+  strikeDelay: 10
   timeRequiredToAbsorb: 5
   isAttacking: 0
   doneAttacking: 0
   soulValue: 0
   isBusy: 0
+  explosionRange: 10
+  explosionDamage: 4
+  explosionKnockBackDuration: 0.4
   attackPrefab: {fileID: 6614077098577363081, guid: e44f6802aca089e4dbf855d3e535ff2a, type: 3}
   timeRequiredToSuck: 5
   enemyTarget: {fileID: 0}
@@ -333,10 +340,10 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2359666415028603131}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Shape: 0
-  m_Extents: {x: 0.6, y: 1, z: 0.6}
+  m_Extents: {x: 1.8, y: 1, z: 1.8}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -802,8 +809,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Consumption-dude_Basic_Rig
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3ac7e243e8f122a48b6e2bcf0cef8bc4, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ac7e243e8f122a48b6e2bcf0cef8bc4, type: 3}
+--- !u!1 &9039307891395969358 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ac7e243e8f122a48b6e2bcf0cef8bc4, type: 3}
+  m_PrefabInstance: {fileID: 8193027882814536735}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8519053535813999604 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3ac7e243e8f122a48b6e2bcf0cef8bc4, type: 3}
