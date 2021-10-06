@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{95612c6f-0204-483d-a8cb-24cf73f6a7f9}">
+		<property name="assetPath">
+			<value>Metal_Hit_8+3+5+swoosh2.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>1.0446458333333333</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{6175e7ee-4d29-4f26-a8bc-c33a33694e15}</destination>
+		</relationship>
+	</object>
+</objects>
