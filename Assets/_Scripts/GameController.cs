@@ -42,13 +42,13 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        startingTime = startingTime * 60;
+        //startingTime = startingTime * 60;
     }
 
     void Update()
     {
         UpdateToFollow(isPlayerDashing);
-        worldTimer.text = FormatTime(startingTime);
+        worldTimer.text = startingTime.ToString("F0");
         startingTime -= Time.deltaTime;
         //Debug.Log(FormatTime(startingTime, Time.deltaTime));
         //Player.GetComponent<PlayerController>().focus = //Utility State enemies in list

@@ -3,17 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BloomProjectile : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
+{ 
+    void OnBecameInvisible()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        Destroy(gameObject);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -28,6 +21,7 @@ public class BloomProjectile : MonoBehaviour
                 if (enemyScript.enemyType == EnemyAI.Type.Utility)
                 {
                     enemyScript.Explode();
+                    GameController.instance.Player.movementScript.utilityKillCount++;
                 }
                 else
                 {
@@ -36,10 +30,6 @@ public class BloomProjectile : MonoBehaviour
 
                 Destroy(this.gameObject);
             }
-        }
-        else
-        {
-            Destroy(this.gameObject);
         }
     }
 }
