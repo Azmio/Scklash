@@ -12,7 +12,8 @@ public class PlayerMovementScript : MonoBehaviour
 
     //Player movement/Rotation Values
     [Header("Player Movement Values")]
-    public float speedMultiplier = 1f;
+    public float minSM = 0f, maxSM = 1.8f;
+    public float speedMultiplier = 0f;
     public float rotationSpeed = 10f;
     private float hitDistance = 100f;
 
@@ -31,9 +32,9 @@ public class PlayerMovementScript : MonoBehaviour
     void Start()
     {
         canMove = true;
-        speedMultiplier = 1f;
+        speedMultiplier = 0f;
     }
-    float utilityQuantity;
+    public float utilityKillCount;
     public void MovementUpdate()
     {
         if (canMove) //player is able to move
@@ -50,16 +51,8 @@ public class PlayerMovementScript : MonoBehaviour
 
             transform.position = currentPos;
         }
-
-        if (playerController.playerHealth.currentHealth >= 6)
-            utilityQuantity = 6f;
-        else if (playerController.playerHealth.currentHealth <= 0)
-            utilityQuantity = 3.4f;
-        else
-            utilityQuantity = (float)playerController.playerHealth.currentHealth;
-
-        
-        speedMultiplier = utilityQuantity * 0.3f;
+               
+        speedMultiplier = 1 + (utilityKillCount * 0.3f);
     }
 
     public void RotateToTarget(Transform target)

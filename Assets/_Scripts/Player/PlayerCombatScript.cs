@@ -20,6 +20,7 @@ public class PlayerCombatScript : MonoBehaviour
 
     public bool isPressed = false;
     public bool isHolding = false;
+    bool actionCompleted = true;
     public float timer = 0.3f;
 
     //Attack Combo
@@ -30,7 +31,7 @@ public class PlayerCombatScript : MonoBehaviour
 
     //Knockback Values
     public float KnockbackDuration = 0.3f;
-    public float knockbackSpeed = 20f;
+    public float knockbackSpeed = 20f;   
 
     //Slash Values
     [Header("Slash Attack")]
@@ -51,65 +52,52 @@ public class PlayerCombatScript : MonoBehaviour
     
     public void CombatUpdate()
     {
-        if (playerController.inputHandler.GetKeyDown(PlayerActions.Attack) && !playerController.isBusy) //If Attack Button is active
-        {           
-            //Debug.Log("Button Down");
-            isPressed = true;
+        if (playerController.inputHandler.GetKeyDown(PlayerActions.Attack) && !playerController.isBusy) //If Attack Button is down
+        {
+            isPressed = true;                                           
             playerController.movementScript.canMove = false;
             playerController.movementScript.RotateToClickLocation();
         }
 
-        if (playerController.inputHandler.GetKeyUp(PlayerActions.Attack) && !playerController.isBusy && !isHolding) //If Attack Button is active
+        if (playerController.inputHandler.GetKeyUp(PlayerActions.Attack) && !playerController.isBusy) //If Attack Button is active
         {
-            //Debug.Log("Button Up");
-            //isAttacking = true;
-
             if (!isHolding) //Check if holding hasn't been activated
             {
-                playerController.anim.Play("Attack1");
                 StartCoroutine(BasicAttack(attackResetTime, comboIndex));
-            }
+            }                     
 
             playerController.movementScript.canMove = true;
             isPressed = false;
             isHolding = false;
+            actionCompleted = false;
             timer = 0.3f;
-        }
+        }        
 
-        if (playerController.inputHandler.GetKeyUp(PlayerActions.Attack) && isHolding)
-        {
-            isHolding = false;
-            playerController.movementScript.canMove = true;
-        }
-
-        if(isPressed)
+        if (isPressed && !actionCompleted)
         {
             timer -= Time.deltaTime;
 
-            if (timer <= 0f)
+            if (timer <= 0f)            
+                isHolding = true;                
+            
+            if (isHolding)
             {
-                isHolding = true;
-                Debug.Log("Holding");
-            }
-        }
+                playerController.anim.Play("Attack1");
 
-        if(isHolding && isPressed)
-        {
-            //bool abilityComplete = false;
-            playerController.anim.Play("Attack1");
-
-            if (detectAttackable(attackRange, attackArc, 8))// && !abilityComplete)
-            {
-                foreach (GameObject enemy in targetList)
+                if (detectAttackable(attackRange, attackArc, 8))
                 {
-                    StartCoroutine(KnockbackTarget(transform.position, enemy));                    
+                    foreach (GameObject enemy in targetList)
+                    {
+                        StartCoroutine(KnockbackTarget(transform.position, enemy));
+                    }                   
                 }
-                //abilityComplete = true;
+
+                timer = 0.3f;
+                actionCompleted = true;
             }
-            //Debug.Log("knockback complete");
-            timer = 0.3f;
-            isPressed = false;
         }
+
+
 
         if (playerController.inputHandler.GetKeyDown(PlayerActions.Slash) && !playerController.isBusy) //Slash Target - Default : RM Button
         {
@@ -118,13 +106,11 @@ public class PlayerCombatScript : MonoBehaviour
 
         if (playerController.inputHandler.GetKeyDown(PlayerActions.Dash) && !playerController.isBusy) //Slash Target - Default : RM Button
         {
-            Debug.Log("woosh");
             StartCoroutine(playerController.movementScript.Dash(0f));
         }
 
         if (playerController.inputHandler.GetKeyDown(PlayerActions.Bloom) && !playerController.isBusy) //Slash Target - Default : RM Button
         {
-            Debug.Log("woosh");
             StartCoroutine(Bloom(0f));
         }
     }
@@ -163,9 +149,7 @@ public class PlayerCombatScript : MonoBehaviour
     {
         playerController.isBusy = true;
         playerController.movementScript.canMove = false;
-        playerController.movementScript.RotateToClickLocation();        
-
-        Debug.Log("attacking");
+        playerController.movementScript.RotateToClickLocation();
 
         if (detectAttackable(attackRange, attackArc, 8))
         {
@@ -175,25 +159,24 @@ public class PlayerCombatScript : MonoBehaviour
             {
                 case 0: //Initial Attack
                     comboIndex++;
-                    Debug.Log("Combo 1");  
-                    //animation 1
+                    //Debug.Log("Combo 1");  
+                    playerController.anim.Play("Attack1");
                     //sound 1
                     break;
 
                 case 1: //Second Attack
                     comboIndex++;
-                    Debug.Log("Combo 2");
-
-                    //animation 2
+                    //Debug.Log("Combo 2");
+                    playerController.anim.Play("Attack1");
                     //sound 2
                     break;
 
                 case 2: //Third Attack
                     comboIndex++;
-                    Debug.Log("Combo 3");
+                    //Debug.Log("Combo 3");
 
-                    attackDamageMultiplier += 2;
-                    //animation 3
+                    //attackDamageMultiplier += 2;
+                    playerController.anim.Play("Attack1");
                     //sound3
                     break;
             }
@@ -204,15 +187,15 @@ public class PlayerCombatScript : MonoBehaviour
 
                 if (enemyHealth.GetHealth() > 0)
                 {
-                    /*if (Vector3.Dot(TargetFacing(enemyHealth.transform.forward, transform.position), transform.forward) < 0.05f) //Sneak modifier added
+                    /**if (Vector3.Dot(TargetFacing(enemyHealth.transform.forward, transform.position), transform.forward) < 0.05f) //Sneak modifier added
                     {
                         attackDamageMultiplier += 2;
                         Debug.Log("Sneak Attack Multiplier Added");
                     }*/
 
-                    enemyHealth.Damage(attackDamage * attackDamageMultiplier);
+                    enemyHealth.Damage(attackDamage);
 
-                    /*if (currentComboIndex == 3)
+                    /**if (currentComboIndex == 3)
                     {
                         StartCoroutine(KnockbackTarget(transform.position, target));
                         comboIndex = 0; //Reset Combo Indexer
@@ -221,8 +204,10 @@ public class PlayerCombatScript : MonoBehaviour
             }
         }
         else
+        {
+            playerController.anim.Play("Attack1");
             comboIndex = 0;
-
+        }
 
         if (comboIndex == 3)
             comboIndex = 0;
@@ -236,29 +221,37 @@ public class PlayerCombatScript : MonoBehaviour
     {
         playerController.isBusy = true;
         playerController.movementScript.canMove = false;
-        //if(target.GetComponent<EnemyAI>().knockbackable)
+        
+        EnemyAI targetAI = target.GetComponent<EnemyAI>();
+        
+        if (targetAI != null)
+        {            
+            if (targetAI.canBeKnocked)
+            {
+                float startTime = Time.time;
 
-        float startTime = Time.time;
+                Vector3 knockbackDirection = (target.transform.position - kPosition).normalized; //Knockback away from player position
+                knockbackDirection.y = 0;              
 
-        Vector3 knockbackDirection = (target.transform.position - kPosition).normalized; //Knockback away from player position
-        knockbackDirection.y = 0;
-        //Vector3 adjustedKDirection = new Vector3(knockbackDirection.x, 0, knockbackDirection.z);
+                while (Time.time < startTime + KnockbackDuration) //Knock back for duration
+                {
+                    target.GetComponent<CharacterController>().Move(knockbackDirection * knockbackSpeed * Time.deltaTime);
 
-        while (Time.time < startTime + KnockbackDuration) //Knock back for duration
-        {
-            target.GetComponent<CharacterController>().Move(knockbackDirection * knockbackSpeed * Time.deltaTime);
-
-            yield return null;
-        }        
+                    yield return null;
+                }
+            }
+        }             
 
         playerController.isBusy = false;
         playerController.movementScript.canMove = true;
+        yield return null;
     }
 
     IEnumerator Slash(float resetTime)
     {
         playerController.isBusy = true;
         playerController.movementScript.canMove = false;
+
         bool slicable = false;
         
         if (detectAttackable(slashRange, slashArc, 8)) //Detect Potential Slash Targets
@@ -280,7 +273,7 @@ public class PlayerCombatScript : MonoBehaviour
             if (slicable)//(slicable)
             {
                 playerController.isInvulnerable = true; //Become Invulnerable
-                Debug.Log("Target count for Utility States: "+targetEnemyList.Count);
+
                 if (targetEnemyList.Count > 1)                      //If more than one potential target
                 {
                     GameObject targetEnemy = new GameObject();
@@ -296,13 +289,15 @@ public class PlayerCombatScript : MonoBehaviour
 
                     playerController.movementScript.RotateToTarget(targetEnemy.transform);          //Rotate to enemy
                     StartCoroutine(playerController.movementScript.Dash(0f));                       //Activate Dashh Through
-                    //Set off utility state explosion                    
+                    //Set off utility state explosion
+                    playerController.movementScript.utilityKillCount++;
                 }
                 else
                 {
                     playerController.movementScript.RotateToTarget(targetEnemyList[0].transform);   //Rotate to enemy
                     StartCoroutine(playerController.movementScript.Dash(0f));                       //Activate Dash Through
                     //Set off utility state explosion
+                    playerController.movementScript.utilityKillCount++;
                 }
             }
         }
